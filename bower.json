@@ -1,0 +1,23 @@
+{
+  "name": "haukka",
+  "version": "0.1",
+  "authors": [
+    "Mohamed Abdellatif <m.latief@gmail.com>"
+  ],
+  "description": "ClinicalTrials.gov query interface",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "3.3.5",
+    "angular": "1.4.1",
+    "angular-resource": "1.4.1",
+    "angular-route": "1.4.1",
+    "angular-ui-router": "~0.2.15"
+  }
+}

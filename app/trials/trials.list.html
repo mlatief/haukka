@@ -1,0 +1,27 @@
+<div class="col-sm-2 side-bar">
+    <h4>Refine by</h4>
+    <!--
+    <trials-refine filter-heading="Location"></trials-refine>
+    <trials-refine filter-heading="Gene Type"></trials-refine>
+    -->
+</div>
+<div class="col-sm-10">
+    <div class="row">
+        <div class="col-sm-12">
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading">
+            <span style="float:left; margin-right:20px;"><h5>Search</h5></span>
+            <query query-string="vm.queryString"></query>
+        </div>
+        <div class="list-group">
+            
+            <trial-row ng-repeat="t in vm.trials" trial="t.clinical_study"></trial-row>
+
+        </div>
+        <div class="panel-footer"></div>
+    </div>
+</div>

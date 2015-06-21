@@ -1,0 +1,77 @@
+body
+{
+    font-family: 'Trebuchet MS';
+}
+
+/* Home page and header styles */
+.masthead-nav, .masthead-brand
+{
+  text-align: center;
+}
+.masthead-brand
+{
+    min-width: 238px;
+    font-family: 'Racing Sans One', cursive;
+    text-shadow: 0 1px 3px rgba(0,0,0,.5);
+}
+
+.masthead-brand > a
+{
+    text-decoration: none;
+}
+
+.inner.cover
+{
+    margin-left: auto;
+    margin-right: auto;
+    width: 700px;
+}
+
+.mastfoot,
+.cover-heading
+{
+  text-align: center;
+}
+
+/* Other pages wrapper */
+.page-wrapper-inner{
+  display: table-cell;
+  vertical-align: top;
+  height: 100%;
+}
+
+@media (min-width: 768px) {
+    .page-wrapper-inner{
+      padding-top: 90px;
+      vertical-align: top;
+    }
+}
+
+.content-wrapper
+{
+  color: black;
+  margin: 0px 0px 0px 0px;
+  padding: 20px;
+  background-color: #fff;
+}
+
+/* Results pages wrapper */
+
+.side-bar > h4
+{
+  color: #999;
+}
+
+.side-bar * h5
+{
+  font-weight: bold;
+}
+
+/* Clinical Trial item style */
+.trial-row{
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12),0 1px 2px rgba(0,0,0,0.24);
+}
+  
