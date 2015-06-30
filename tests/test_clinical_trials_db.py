@@ -11,15 +11,30 @@ class ClinicalTrialsTestCase(HaukkaDbTestCase):
         pass
 
     def test_insert_clinical_trial_xml(self):
-        m = hashlib.md5()
-        m.update(self.clinical_trial1)
-        checksum = m.hexdigest()
-        ct_id = self.db.insert_clinical_trial_xml(self.nct_id1, self.clinical_trial1, checksum)
-        self.assertEqual(ct_id, self.nct_id1)
+        ct = self.trials[0]
+        ct_id = self.db.insert_clinical_trial_xml(ct['id'], ct['xml'], ct['checksum'])
+        self.assertEqual(ct_id, ct['id'])
 
     def test_get_clinical(self):
-        pass
+        ct = self.trials[0]
+        ct_id = self.db.insert_clinical_trial_xml(ct['id'], ct['xml'], ct['checksum'])
+        self.assertEqual(ct_id, ct['id'])
 
+        r = self.db.get_clinical_trial_by_id(ct['id'])
+        self.assertEqual(r['nctid'], ct_id)
+        self.assertEqual(r['checksum'], ct['checksum'])
+        self.assertIsNotNone(r['ctdata'])
+        self.assertIsNotNone(r['inserted'])
+
+        ctdata = r['ctdata']
+        self.assertIsNotNone(ctdata['clinical_study'])
+        self.assertIsNotNone(ctdata['clinical_study']['id_info'])
+        self.assertIsNotNone(ctdata['clinical_study']['id_info']['nct_id'])
+        self.assertEqual(ctdata['clinical_study']['id_info']['nct_id'], ct_id)
+
+        self.assertIsNotNone(ctdata['clinical_study']['overall_status'])
+        self.assertEqual(ctdata['clinical_study']['overall_status'], ct['status'])
+        # print 'United States' in ctdata['clinical_study']['location_countries']['country']
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,18 +1,15 @@
+import xml.etree.ElementTree as ET
 import unittest
-import my_testing_postgresql
-import psycopg2
+import hashlib
 import pyhaukka.db
-from datetime import datetime
 
-# Temporary Database
-postgresql = my_testing_postgresql.MyPostgresql(initdb='C:\\PostgreSQL\\9.4\\bin\\initdb.exe',
-                                                postgres='C:\\PostgreSQL\\9.4\\bin\\postgres.exe')
-print 'Initialized PostgreSQL instance!'
+POSTGRESQL_URL = "dbname='{}' user='{}'".format('haukka_test', 'haukka')
 
 class HaukkaDbTestCase(unittest.TestCase):
     def setUp(self):
-        self.db = pyhaukka.db.ClinicalTrialsDatabase(postgresql.url())
+        self.db = pyhaukka.db.ClinicalTrialsDatabase(POSTGRESQL_URL)
         self.db.execute("BEGIN;")
+        self.db.execute(open("schema.sql", "r").read())
 
     def tearDown(self):
         self.db.execute("ROLLBACK;")
@@ -21,24 +18,22 @@ class HaukkaDbTestCase(unittest.TestCase):
     def setUpClass(cls):
         print "Testing ", cls.__name__
         # Read test trials fixtures from xml files
-        cls.nct_id1 = 'NCT00001160'
-        cls.nct_id2 = 'NCT00001163'
-        cls.nct_id3 = 'NCT02034110'
+        nct_ids = ['NCT00001160', 'NCT00001163',  'NCT02034110']
+        cls.trials = []
+        for id in nct_ids:
+            with open("../data/{}.XML".format(id)) as ct:
+                ct_xml = ct.read()
 
-        with open('../data/NCT00001160.XML') as ct:
-            cls.clinical_trial1 = ct.read()
-        with open('../data/NCT00001163.XML') as ct:
-            cls.clinical_trial2 = ct.read()
-        with open('../data/NCT02034110.XML') as ct:
-            cls.clinical_trial3 = ct.read()
+                m = hashlib.md5()
+                m.update(ct_xml)
+                ct_checksum = m.hexdigest()
 
-        if cls.clinical_trial1 is None or cls.clinical_trial2 is None or cls.clinical_trial3 is None:
+                root = ET.fromstring(ct_xml)
+                ct_status = root.findtext('./overall_status')
+                print ct_status
+                trial = {'id': id, 'xml': ct_xml, 'status': ct_status, 'checksum': ct_checksum}
+                cls.trials.append(trial)
+
+
+        if len(cls.trials) < len(nct_ids):
             raise Exception("Couldn't read all test data...")
-
-        with psycopg2.connect(postgresql.url()) as conn:
-            with conn.cursor() as cur:
-                cur.execute(open("schema.sql", "r").read())
-
-    @classmethod
-    def tearDownClass(cls):
-        pass

@@ -17,6 +17,7 @@ SET client_min_messages = warning;
 -- TOC entry 173 (class 1259 OID 16654)
 -- Name: clinical_trials; Type: TABLE; Schema: public; Owner: -
 --
+-- DROP TABLE IF EXISTS clinical_trials;
 
 CREATE TABLE clinical_trials (
     nctid text NOT NULL,
