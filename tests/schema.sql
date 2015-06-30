@@ -2,10 +2,6 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.4.2
--- Dumped by pg_dump version 9.4.2
--- Started on 2015-06-28 02:39:34
-
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET client_encoding = 'UTF8';
@@ -22,14 +18,12 @@ SET client_min_messages = warning;
 CREATE TABLE clinical_trials (
     nctid text NOT NULL,
     ctdata json,
-    gner_tags jsonb,
-    curator_tags jsonb,
+    tsv TSVECTOR,
     inserted timestamp without time zone,
     tagged timestamp without time zone,
     lastcurated timestamp without time zone,
     checksum text
 );
-
 
 --
 -- TOC entry 1985 (class 2606 OID 16661)
@@ -39,8 +33,30 @@ CREATE TABLE clinical_trials (
 ALTER TABLE ONLY clinical_trials
     ADD CONSTRAINT clinical_trials_pkey PRIMARY KEY (nctid);
 
+--
 
--- Completed on 2015-06-28 02:39:35
+CREATE INDEX tsv_idx ON clinical_trials USING gin(tsv);
+
+CREATE FUNCTION ct_search_trigger() RETURNS trigger AS $$
+begin
+  new.tsv :=
+    setweight(to_tsvector(coalesce(new.ctdata#>>'{clinical_study, brief_title}','')), 'A') ||
+    setweight(to_tsvector(coalesce(new.ctdata#>>'{clinical_study, official_title}','')), 'A') ||
+    setweight(to_tsvector(coalesce(new.ctdata#>>'{clinical_study, condition}','')), 'A') ||
+    setweight(to_tsvector(coalesce(new.ctdata#>>'{clinical_study, keyword}','')), 'A') ||
+    setweight(to_tsvector(coalesce(new.ctdata#>>'{clinical_study, brief_summary, textblock}','')), 'B') ||
+    setweight(to_tsvector(coalesce(new.ctdata#>>'{clinical_study, arm_group}','')), 'B') ||
+    setweight(to_tsvector(coalesce(new.ctdata#>>'{clinical_study, eligibility, criteria, textblock}','')), 'D') ||
+    setweight(to_tsvector(coalesce(new.ctdata#>>'{clinical_study, study_type}','')), 'D') ||
+    setweight(to_tsvector(coalesce(new.ctdata#>>'{clinical_study, study_design}','')), 'D');
+  return new;
+end
+$$ LANGUAGE plpgsql;
+
+--
+
+CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE
+ON clinical_trials FOR EACH ROW EXECUTE PROCEDURE ct_search_trigger();
 
 --
 -- PostgreSQL database dump complete

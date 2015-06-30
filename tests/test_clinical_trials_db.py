@@ -15,7 +15,7 @@ class ClinicalTrialsTestCase(HaukkaDbTestCase):
         ct_id = self.db.insert_clinical_trial_xml(ct['id'], ct['xml'], ct['checksum'])
         self.assertEqual(ct_id, ct['id'])
 
-    def test_get_clinical(self):
+    def test_get_clinical_trial_by_id(self):
         ct = self.trials[0]
         ct_id = self.db.insert_clinical_trial_xml(ct['id'], ct['xml'], ct['checksum'])
         self.assertEqual(ct_id, ct['id'])
@@ -35,6 +35,43 @@ class ClinicalTrialsTestCase(HaukkaDbTestCase):
         self.assertIsNotNone(ctdata['clinical_study']['overall_status'])
         self.assertEqual(ctdata['clinical_study']['overall_status'], ct['status'])
         # print 'United States' in ctdata['clinical_study']['location_countries']['country']
+
+    def test_search_clinical_trials_basic(self):
+        q = "Eastern BRAF"
+
+        ct_ids = []
+        for ct in self.trials:
+            ct_id = self.db.insert_clinical_trial_xml(ct['id'], ct['xml'], ct['checksum'])
+            ct_ids.append(ct_id)
+
+        r = self.db.search_clinical_trials(q)
+        self.assertIsNotNone(r)
+        self.assertIsInstance(r, list)
+        self.assertTrue(len(r) >= 1)
+
+        ct = r[0]
+        self.assertIsNotNone(ct)
+        self.assertTrue(ct['nctid'] in ct_ids)
+        self.assertIsNotNone(ct['headline'])
+        self.assertIsNotNone(ct['ctdata'])
+        self.assertIsNotNone(ct['rank'])
+
+    def test_search_clinical_trials_expansion(self):
+        q = "BRAF-1"
+
+        ct_ids = []
+        for ct in self.trials:
+            ct_id = self.db.insert_clinical_trial_xml(ct['id'], ct['xml'], ct['checksum'])
+            ct_ids.append(ct_id)
+
+        r = self.db.search_clinical_trials(q)
+        self.assertIsNotNone(r)
+        self.assertIsInstance(r, list)
+        self.assertEqual(len(r), 1)
+
+        ct = r[0]
+        self.assertIsNotNone(ct)
+        self.assertTrue(ct['nctid'] in ct_ids)
 
 if __name__ == '__main__':
     unittest.main()

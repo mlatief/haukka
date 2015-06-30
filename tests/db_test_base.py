@@ -3,16 +3,25 @@ import unittest
 import hashlib
 import pyhaukka.db
 
-POSTGRESQL_URL = "dbname='{}' user='{}'".format('haukka_test', 'haukka')
+import psycopg2
+
+# User Passwords are loaded from %APPDATA%\postgresql\pgpass.conf by the driver
+PRE_POSTGRES_URL = "user='postgres'" # Connect with postgres user to create a DB
+
+TEST_DB = 'haukka_test'
+TEST_DB_USER = 'haukka'
+POSTGRES_URL = "dbname='{}' user='{}'".format(TEST_DB, TEST_DB_USER)
+
 
 class HaukkaDbTestCase(unittest.TestCase):
     def setUp(self):
-        self.db = pyhaukka.db.ClinicalTrialsDatabase(POSTGRESQL_URL)
+        self.db = pyhaukka.db.ClinicalTrialsDatabase(POSTGRES_URL)
         self.db.execute("BEGIN;")
-        self.db.execute(open("schema.sql", "r").read())
 
     def tearDown(self):
         self.db.execute("ROLLBACK;")
+        del self.db
+        self.db = None
 
     @classmethod
     def setUpClass(cls):
@@ -30,10 +39,34 @@ class HaukkaDbTestCase(unittest.TestCase):
 
                 root = ET.fromstring(ct_xml)
                 ct_status = root.findtext('./overall_status')
-                print ct_status
                 trial = {'id': id, 'xml': ct_xml, 'status': ct_status, 'checksum': ct_checksum}
                 cls.trials.append(trial)
 
-
         if len(cls.trials) < len(nct_ids):
             raise Exception("Couldn't read all test data...")
+
+        with psycopg2.connect(PRE_POSTGRES_URL) as conn:
+            conn.autocommit=True
+            cls.db_created = False
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1 FROM pg_database WHERE datname = %s", (TEST_DB,))
+                r = cur.fetchone()
+                if r is None:
+                    cur.execute('CREATE DATABASE {};'.format(TEST_DB))
+                    cls.db_created = True
+
+        with psycopg2.connect(POSTGRES_URL) as conn:
+            conn.autocommit=True
+            with conn.cursor() as cur:
+                cur.execute(open("schema.sql", "r").read())
+
+    @classmethod
+    def tearDownClass(cls):
+        if cls.db_created:
+            with psycopg2.connect(PRE_POSTGRES_URL) as conn:
+                conn.autocommit=True
+                with conn.cursor() as cur:
+                    cur.execute('DROP DATABASE {};'.format(TEST_DB))
+                    print "... dropped db!"
+                    cls.db_created = False
+

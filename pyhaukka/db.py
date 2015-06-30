@@ -35,6 +35,9 @@ class ClinicalTrialsDatabase(object):
         log.info("... connected, ujson registered, cursor_factory=DictCursor"
                       ", autocommit {}".format(self.conn.autocommit))
 
+    def __del__(self):
+        self.conn.close()
+
     def execute(self, query, **args):
         with self.conn:
             with self.conn.cursor() as cur:
@@ -69,27 +72,23 @@ class ClinicalTrialsDatabase(object):
                 log.debug("... clinical trial {} inserted, checksum: {}".format(nctid, checksum))
                 return r[0]
 
-    # GNER Tags: [{'ne': '<named entity>', 'type': '<gene, drug, alteration ...>'}, ... ]
-    def append_gner_tags_to_clinical_trial(self, nctid, tags):
-        pass
-
-    def remove_all_gner_tags_from_clinical_trial(self, nctid):
+    def search_clinical_trials(self, query):
+        # First release just search without query expansion
+        stmt = """
+        SELECT nctid, ctdata, rank,
+               ts_headline(ctdata->>'clinical_study', q, 'MaxFragments = 5') as headline FROM (
+          SELECT nctid, ctdata, tsv, q, ts_rank_cd(tsv, q) as rank
+          FROM clinical_trials, plainto_tsquery(%s) AS q
+          WHERE (tsv @@ q)
+        ) AS t1 ORDER BY t1.rank DESC;
+        """
+        #   SELECT nctid, ctdata#>'{"clinical_study", "official_title"}' as title
+        #   FROM clinical_trials
         with self.conn:
             with self.conn.cursor() as cur:
-                stmt = "UPDATE clinical_trials SET gner_tagged = [] WHERE nctid = %s"
-                cur.execute(stmt, (nctid,))
-                log.warn("... clinicatl trial {} inserted, checksum: {}"
-                             .format(nctid))
+                cur.execute(stmt, (query,))
+                r = cur.fetchall()
+                log.debug("... clinical trials search returned {} trials!".format(len(r)))
+                return r
 
-    def set_clinical_trial_rank(self, nctid, rank):
-        pass
 
-    # Curator Tags: [{'curator': '<curator name>', 'tag': '<tag data>'}, ... ]
-    def append_curator_tags_to_clinical_trial(self, nctid, tags):
-        pass
-
-    def remove_all_curator_tags_from_clinical_trial(self, nctid):
-        pass
-
-    def get_list_of_clinical_trials(self, tags):
-        pass
