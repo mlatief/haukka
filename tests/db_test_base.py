@@ -6,17 +6,22 @@ import pyhaukka.db
 import psycopg2
 
 # User Passwords are loaded from %APPDATA%\postgresql\pgpass.conf by the driver
-PRE_POSTGRES_URL = "user='postgres'" # Connect with postgres user to create a DB
 
+TEST_DB_HOST = 'localhost'
+TEST_DB_PORT = '5432'
 TEST_DB = 'haukka_test'
 TEST_DB_USER = 'haukka'
-POSTGRES_URL = "dbname='{}' user='{}'".format(TEST_DB, TEST_DB_USER)
+TEST_DB_URL = "host={} port={} dbname={} user={}".format(TEST_DB_HOST, TEST_DB_PORT, TEST_DB, TEST_DB_USER)
+
+TEST_POSTGRES_USER = 'postgres'
+TEST_POSTGRES_URL = "host={} port={} user={}".format(TEST_DB_HOST, TEST_DB_PORT, TEST_POSTGRES_USER) # Connect with postgres user to create a DB
 
 
 class HaukkaDbTestCase(unittest.TestCase):
     def setUp(self):
-        self.db = pyhaukka.db.ClinicalTrialsDatabase(POSTGRES_URL)
+        self.db = pyhaukka.db.ClinicalTrialsDatabase(TEST_DB_URL)
         self.db.execute("BEGIN;")
+        self.db.execute(open("tests/schema.sql", "r").read())
 
     def tearDown(self):
         self.db.execute("ROLLBACK;")
@@ -30,7 +35,7 @@ class HaukkaDbTestCase(unittest.TestCase):
         nct_ids = ['NCT00001160', 'NCT00001163',  'NCT02034110']
         cls.trials = []
         for id in nct_ids:
-            with open("../data/{}.XML".format(id)) as ct:
+            with open("data/{}.XML".format(id)) as ct:
                 ct_xml = ct.read()
 
                 m = hashlib.md5()
@@ -45,7 +50,7 @@ class HaukkaDbTestCase(unittest.TestCase):
         if len(cls.trials) < len(nct_ids):
             raise Exception("Couldn't read all test data...")
 
-        with psycopg2.connect(PRE_POSTGRES_URL) as conn:
+        with psycopg2.connect(TEST_POSTGRES_URL) as conn:
             conn.autocommit=True
             cls.db_created = False
             with conn.cursor() as cur:
@@ -55,18 +60,12 @@ class HaukkaDbTestCase(unittest.TestCase):
                     cur.execute('CREATE DATABASE {};'.format(TEST_DB))
                     cls.db_created = True
 
-        with psycopg2.connect(POSTGRES_URL) as conn:
-            conn.autocommit=True
-            with conn.cursor() as cur:
-                cur.execute(open("schema.sql", "r").read())
-
     @classmethod
-    def tearDownClass(cls):
+    def __del__(cls):
         if cls.db_created:
-            with psycopg2.connect(PRE_POSTGRES_URL) as conn:
+            with psycopg2.connect(TEST_POSTGRES_URL) as conn:
                 conn.autocommit=True
                 with conn.cursor() as cur:
                     cur.execute('DROP DATABASE {};'.format(TEST_DB))
                     print "... dropped db!"
                     cls.db_created = False
-

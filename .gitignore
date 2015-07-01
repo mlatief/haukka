@@ -60,5 +60,5 @@ target/
 # PyCharm
 .idea
 
-data
 env
+downloads
