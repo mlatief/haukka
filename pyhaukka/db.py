@@ -1,5 +1,5 @@
 import psycopg2
-from psycopg2.extras import DictCursor
+from psycopg2.extras import DictCursor, RealDictCursor
 from utils import init_logger
 import ujson
 from datetime import datetime
@@ -35,7 +35,7 @@ class ClinicalTrialsDatabase(object):
         if not conn_uri:
             conn_uri = "dbname='{}' user='{}'".format(DEFAULT_DB_NAME, DEFAULT_USER)
         log.info("Connecting to PostgreSQL DB: {}".format(conn_uri))
-        self.conn = psycopg2.connect(conn_uri, cursor_factory=DictCursor)
+        self.conn = psycopg2.connect(conn_uri, cursor_factory=RealDictCursor)
         self.conn.autocommit = True
         psycopg2.extras.register_json(self.conn, loads=loads)
         log.info("... connected, ujson registered, cursor_factory=DictCursor"
@@ -48,7 +48,7 @@ class ClinicalTrialsDatabase(object):
         self.conn.close()
 
     def is_connected(self):
-        return self.connected()
+        return self.conn.connected()
 
     def execute(self, query, **args):
         with self.conn as conn:
@@ -82,7 +82,7 @@ class ClinicalTrialsDatabase(object):
                 cur.execute(stmt, (nctid, uJson(ct_dict), datetime.now(), checksum))
                 r = cur.fetchone()
                 log.debug("... clinical trial {} inserted, checksum: {}".format(nctid, checksum))
-                return r[0]
+                return r['nctid']
 
     def get_all_clinical_trials(self, limit=20, offset=0):
         stmt = """
@@ -113,7 +113,7 @@ class ClinicalTrialsDatabase(object):
             with conn.cursor() as cur:
                 cur.execute(stmt, (query,limit, offset))
                 r = cur.fetchall()
-                log.debug("... clinical trials search returned {} trials!".format(len(r)))
+                log.debug("... clinical trials text seach with '{}' returned {} trial{}!".format(query, len(r), '' if len(r)==1 else 's'))
                 return r
 
 

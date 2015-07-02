@@ -24,6 +24,7 @@ class HaukkaDbTestCase(unittest.TestCase):
 
     def tearDown(self):
         self.db.execute("ROLLBACK;")
+        self.db.close()
         del self.db
         self.db = None
 
