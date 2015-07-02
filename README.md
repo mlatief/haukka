@@ -21,9 +21,17 @@ $ python -m unittest tests.test_db_connection
 ```
 
 ### Run
+* Loading clinical trials from `data/in`
+
+```sh
+$ python etl_xml_db.py
+```
+
 * Standalone development server
 
-    TODO
+```sh
+$ python run.py
+```
 
 * uwsgi
     
@@ -33,20 +41,45 @@ $ python -m unittest tests.test_db_connection
     
     TODO
 
-### Sample data pyhaukka and tests
+### Sample data for tests
 
-Folder `data` contains some clinical trials downloaded from http://clinicaltrials.gov to be used while testing.
+Folder `data` also contains some clinical trials downloaded from http://clinicaltrials.gov to be used while testing.
 
 ## Status
 
-> Currently, only partial DB API of pyhaukka is implemented.
+> * Currently, major parts of pyhaukka DB API is implemented, especially responsible for search. 
+> * Requests are now wrapped with a Flask-RESTful API. 
+> * Unit tests are created for both DB and Flask app.
+> * Clinical Trials loader is available to load multiple xml files into the DB
 
-#### DB API implemented
-* `get_clinical_trial_by_id`
-* `insert_clinical_trial_xml`
+#### DB API
+##### Implemented and tested
+* `get_clinical_trial_by_id`: Returns single trial given its NCT ID
+* `insert_clinical_trial_xml`: Takes trial xml data, checksum and nctid and inserts it into `clinical_trials`` table.
 * `search_clinical_trials`: Currently support searching by GENE names, but not yet with name expansion (e.g. searching for BRAF would not match trials with aliases such as: BRAF1, BRAF-1, P94 .. etc)
 
-#### DB API planned
+##### Planned
 * `search_clinical_trials`: Support searching by GENE names and expand queries to aliases (e.g. from http://www.genecards.org/cgi-bin/carddisp.pl?gene=BRAF)
 
+#### Flask-RESTful API
+
+##### Implemented and tested
+Resource URL | HTTP Verb | Functionality |
+-------------| :---------: |---------------|
+`/1/trials?q=gene_names`   | GET       | Retrieving clinical trials   |
+
+##### Planned
+Resource URL | HTTP Verb | Functionality 
+-------------| :---------: |---------------
+`/1/trials/nct_id`   | _GET_      | Retrieve a single trial   
+`/1/trials/nct_id/biomarkers`  | _GET_ | Retrieve clinical trial's biomarkers   
+`/1/trials/nct_id/biomarkers`   | _POST_ | Confirm/Add a biomarker by curator   
+`/1/trials/nct_id/biomarkers`   | _DELETE_ | Removes a biomarker by curator 
+`/1/trials`   | _POST_      | Insert new clinical trial   
+
+#### Others
+
+##### Implemented and tested
+
+* `etl_xml_db.py`: Module to process and load clinical trials xml files into database.
 
