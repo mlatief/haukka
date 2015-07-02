@@ -1,6 +1,8 @@
 from db_test_base import HaukkaDbTestCase
 import unittest
-import hashlib
+
+
+# TODO: Add paging test cases for get_all and search_clinical_trials
 
 class ClinicalTrialsTestCase(HaukkaDbTestCase):
     def test_execute(self):
@@ -34,7 +36,23 @@ class ClinicalTrialsTestCase(HaukkaDbTestCase):
 
         self.assertIsNotNone(ctdata['clinical_study']['overall_status'])
         self.assertEqual(ctdata['clinical_study']['overall_status'], ct['status'])
-        # print 'United States' in ctdata['clinical_study']['location_countries']['country']
+
+    def test_get_all_clinical_trials(self):
+        ct_ids = []
+        for ct in self.trials:
+            ct_id = self.db.insert_clinical_trial_xml(ct['id'], ct['xml'], ct['checksum'])
+            ct_ids.append(ct_id)
+
+        r = self.db.get_all_clinical_trials()
+        self.assertIsNotNone(r)
+        self.assertIsInstance(r, list)
+        self.assertEqual(len(r), 3)
+
+        ct = r[0]
+        self.assertIsNotNone(ct)
+        self.assertEqual(ct['nctid'], max(ct_ids)) # Ordered by NCTID, first is the highest
+        self.assertIsNotNone(ct['ctdata'])
+        self.assertIsNotNone(ct['ctdata']['clinical_study'])
 
     def test_search_clinical_trials_basic(self):
         q = "Eastern BRAF"

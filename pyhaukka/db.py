@@ -8,9 +8,14 @@ from xml_dict import ConvertXmlToDict
 
 DEFAULT_DB_NAME = 'haukka'
 DEFAULT_USER = 'haukka'
-# Password is retrieved by libpq from .pgpass file (on Windows %APPDATA%\postgresql\pgpass.conf)
 
 log = init_logger(__name__)
+
+
+# TODO: Improve paging performance (may be using seek instead of offset!)
+#        http://leopard.in.ua/2014/10/11/postgresql-paginattion/
+# TODO: Support trials tags updating
+# TODO: Support users...
 
 # Custom JSON adaptations
 class uJson(psycopg2.extras.Json):
@@ -24,6 +29,7 @@ class uJson(psycopg2.extras.Json):
 # Custom psycopg2JSON adaptation from PostgreSQL to Python that uses uJson
 loads = lambda x: ujson.loads(x)
 
+#object: new style classes!
 class ClinicalTrialsDatabase(object):
     def __init__(self, conn_uri=''):
         if not conn_uri:
@@ -38,15 +44,21 @@ class ClinicalTrialsDatabase(object):
     def __del__(self):
         self.conn.close()
 
+    def close(self):
+        self.conn.close()
+
+    def is_connected(self):
+        return self.connected()
+
     def execute(self, query, **args):
-        with self.conn:
-            with self.conn.cursor() as cur:
+        with self.conn as conn:
+            with conn.cursor() as cur:
                 cur.execute(query, args)
 
 
     def query_db(self, query, args=(), one=True):
-        with self.conn:
-            with self.conn.cursor() as cur:
+        with self.conn as conn:
+            with conn.cursor() as cur:
                 cur.execute(query, args)
                 if one:
                     rv = cur.fetchone()
@@ -61,8 +73,8 @@ class ClinicalTrialsDatabase(object):
         return r
 
     def insert_clinical_trial_xml(self, nctid, ct_xml_string, checksum):
-        with self.conn:
-            with self.conn.cursor() as cur:
+        with self.conn as conn:
+            with conn.cursor() as cur:
                 ct_dict = ConvertXmlToDict(ct_xml_string)
                 stmt = """INSERT INTO clinical_trials (nctid, ctdata, inserted, checksum)
                           VALUES (%s, %s, %s, %s)
@@ -72,7 +84,20 @@ class ClinicalTrialsDatabase(object):
                 log.debug("... clinical trial {} inserted, checksum: {}".format(nctid, checksum))
                 return r[0]
 
-    def search_clinical_trials(self, query):
+    def get_all_clinical_trials(self, limit=20, offset=0):
+        stmt = """
+        SELECT nctid, ctdata
+        FROM clinical_trials
+        ORDER BY nctid DESC LIMIT %s OFFSET %s;
+        """
+        with self.conn as conn:
+            with conn.cursor() as cur:
+                cur.execute(stmt, (limit, offset))
+                r = cur.fetchall()
+                log.debug("... fetched {} clinical trials!".format(len(r)))
+                return r
+
+    def search_clinical_trials(self, query, limit=20, offset=0):
         # First release just search without query expansion
         stmt = """
         SELECT nctid, ctdata, rank,
@@ -80,13 +105,13 @@ class ClinicalTrialsDatabase(object):
           SELECT nctid, ctdata, tsv, q, ts_rank_cd(tsv, q) as rank
           FROM clinical_trials, plainto_tsquery(%s) AS q
           WHERE (tsv @@ q)
-        ) AS t1 ORDER BY t1.rank DESC;
+        ) AS t1 ORDER BY t1.rank, t1.nctid DESC LIMIT %s OFFSET %s;
         """
         #   SELECT nctid, ctdata#>'{"clinical_study", "official_title"}' as title
         #   FROM clinical_trials
-        with self.conn:
-            with self.conn.cursor() as cur:
-                cur.execute(stmt, (query,))
+        with self.conn as conn:
+            with conn.cursor() as cur:
+                cur.execute(stmt, (query,limit, offset))
                 r = cur.fetchall()
                 log.debug("... clinical trials search returned {} trials!".format(len(r)))
                 return r

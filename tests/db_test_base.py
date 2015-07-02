@@ -5,8 +5,7 @@ import pyhaukka.db
 
 import psycopg2
 
-# User Passwords are loaded from %APPDATA%\postgresql\pgpass.conf by the driver
-
+# Password is retrieved by libpq from ~/.pgpass file (on Windows %APPDATA%\postgresql\pgpass.conf)
 TEST_DB_HOST = 'localhost'
 TEST_DB_PORT = '5432'
 TEST_DB = 'haukka_test'
@@ -32,7 +31,7 @@ class HaukkaDbTestCase(unittest.TestCase):
     def setUpClass(cls):
         print "Testing ", cls.__name__
         # Read test trials fixtures from xml files
-        nct_ids = ['NCT00001160', 'NCT00001163',  'NCT02034110']
+        nct_ids = ['NCT02034110', 'NCT00001160', 'NCT00001163' ]
         cls.trials = []
         for id in nct_ids:
             with open("data/{}.XML".format(id)) as ct:
@@ -66,6 +65,6 @@ class HaukkaDbTestCase(unittest.TestCase):
             with psycopg2.connect(TEST_POSTGRES_URL) as conn:
                 conn.autocommit=True
                 with conn.cursor() as cur:
-                    cur.execute('DROP DATABASE {};'.format(TEST_DB))
+                    #cur.execute('DROP DATABASE {};'.format(TEST_DB))
                     print "... dropped db!"
                     cls.db_created = False
