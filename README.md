@@ -66,16 +66,16 @@ Folder `data` also contains some clinical trials downloaded from http://clinical
 ##### Implemented and tested
 Resource URL | HTTP Verb | Functionality |
 -------------| :---------: |---------------|
-`/1/trials?q=gene_names`   | GET       | Retrieving clinical trials   |
+`/trials?q=gene_names`   | GET       | Retrieving clinical trials   |
 
 ##### Planned
 Resource URL | HTTP Verb | Functionality 
 -------------| :---------: |---------------
-`/1/trials/nct_id`   | _GET_      | Retrieve a single trial   
-`/1/trials/nct_id/biomarkers`  | _GET_ | Retrieve clinical trial's biomarkers   
-`/1/trials/nct_id/biomarkers`   | _POST_ | Confirm/Add a biomarker by curator   
-`/1/trials/nct_id/biomarkers`   | _DELETE_ | Removes a biomarker by curator 
-`/1/trials`   | _POST_      | Insert new clinical trial   
+`/trials/nct_id`   | _GET_      | Retrieve a single trial
+`/trials/nct_id/biomarkers`  | _GET_ | Retrieve clinical trial's biomarkers
+`/trials/nct_id/biomarkers`   | _POST_ | Confirm/Add a biomarker by curator
+`/trials/nct_id/biomarkers`   | _DELETE_ | Removes a biomarker by curator
+`/trials`   | _POST_      | Insert new clinical trial
 
 #### Others
 

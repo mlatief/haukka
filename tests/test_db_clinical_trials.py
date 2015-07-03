@@ -75,7 +75,7 @@ class ClinicalTrialsTestCase(HaukkaDbTestCase):
         self.assertIsNotNone(ct['rank'])
 
     def test_search_clinical_trials_expansion(self):
-        q = "BRAF-1"
+        q = "BRAF-1" # BRAF, ..
 
         ct_ids = []
         for ct in self.trials:

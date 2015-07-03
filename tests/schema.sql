@@ -18,12 +18,22 @@ SET client_min_messages = warning;
 CREATE TABLE clinical_trials (
     nctid text NOT NULL,
     ctdata json,
+    gner_tags jsonb,
+    curator_tags jsonb,
     tsv TSVECTOR,
     inserted timestamp without time zone,
     tagged timestamp without time zone,
     lastcurated timestamp without time zone,
     checksum text
 );
+
+CREATE TABLE clinical_trials_history (
+    nctid text NOT NULL,
+    last_updated timestamp without time zone,
+    ctdata json
+);
+
+-- Consider storing only the diff!
 
 --
 -- TOC entry 1985 (class 2606 OID 16661)
@@ -36,6 +46,8 @@ ALTER TABLE ONLY clinical_trials
 --
 
 CREATE INDEX tsv_idx ON clinical_trials USING gin(tsv);
+
+CREATE INDEX nct_idx ON clinical_trials_history (nctid);
 
 CREATE FUNCTION ct_search_trigger() RETURNS trigger AS $$
 begin

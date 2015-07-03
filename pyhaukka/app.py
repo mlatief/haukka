@@ -40,5 +40,5 @@ from pyhaukka.resources.trials import  Trials
 from pyhaukka.resources.trial import  Trial
 
 # Register endpoint(s)
-api.add_resource(Trials, '/1/trials')
-api.add_resource(Trial,  '/1/trials/<string:trial_id>')
+api.add_resource(Trials, '/trials')
+api.add_resource(Trial,  '/trials/<string:trial_id>')
