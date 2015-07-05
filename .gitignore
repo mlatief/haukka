@@ -68,3 +68,5 @@ config.py
 data/in
 data/out
 data/err
+
+.vagrant
