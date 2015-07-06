@@ -1,30 +1,22 @@
 from pyhaukka.app import app
 from db_test_base import HaukkaDbTestCase
 
-from contextlib import contextmanager
-from flask import appcontext_pushed, g
+from pyhaukka.utils import init_logger
 
-@contextmanager
-def ct_db_set(db):
-    def handler(sender, **kwargs):
-        g._database = db
-    with appcontext_pushed.connected_to(handler, app):
-        yield
+log = init_logger('resource_test_base')
+
 
 class PyhaukkaTestCase(HaukkaDbTestCase):
     def setUp(self):
         super(PyhaukkaTestCase, self).setUp()
-        app.config['TESTING'] = True
+        app.db = self.db
         self.app = app
 
     def tearDown(self):
-        # Rollback is performed automatically since AppContext close the connection without a commit
-        if self.db.is_connected:
+        # Rollback should have been performed since AppContext should close the connection without a commit!
+        if self.db.is_connected():
+            log.warn('Connection is still open, connection will be closed explicitly!')
             self.db.close()
-
-        del self.db
-        self.db = None
-
 
     def check_content_type(self, headers):
       self.assertEqual(headers['Content-Type'], 'application/json')

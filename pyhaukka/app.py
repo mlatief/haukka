@@ -8,24 +8,23 @@ app.config.from_object('config')
 # WhiteNoise to smartly serve static files (support gzip, caching and other stuff suitable for using behind a CDN )!
 from whitenoise import WhiteNoise
 app.wsgi_app = WhiteNoise(app.wsgi_app,
-                          root=app.config.get('STATIC_DIR', app.config['BASE_DIR'] + '/static'),
+                          root=app.config['STATIC_DIR'],
                           prefix=app.config.get('STATIC_PREFIX', ''))
 
 # DB Module
 from pyhaukka.db import ClinicalTrialsDatabase
-db = ClinicalTrialsDatabase()
+app.db = ClinicalTrialsDatabase(app.config['DATABASE_URI'])
 
 
 def get_db():
     gdb = getattr(g, '_database', None)
     if gdb is None:
-        gdb = g._database = ClinicalTrialsDatabase(app.config.get('DATABASE_URI', ''))
+        gdb = g._database = app.db.connect()
     return gdb
 
 
 @app.teardown_appcontext
 def close_connection(exception):
-    print "App context tearDown called..."
     gdb = getattr(g, '_database', None)
     if gdb is not None:
         gdb.close()
