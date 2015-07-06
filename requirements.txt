@@ -5,6 +5,7 @@ itsdangerous==0.24
 Jinja2==2.7.3
 MarkupSafe==0.23
 psycopg2==2.6.1
+pytest==2.7.2
 pytz==2015.4
 six==1.9.0
 ujson==1.33

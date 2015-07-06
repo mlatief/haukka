@@ -68,9 +68,18 @@ Vagrant.configure(2) do |config|
     sudo aptitude update
     sudo aptitude -y upgrade
     sudo aptitude install -y build-essential git python-dev python2.7-dev libpq-dev
-    wget -q https://bootstrap.pypa.io/get-pip.py
+    
+    wget --quiet https://bootstrap.pypa.io/get-pip.py
     sudo python get-pip.py
     sudo pip install virtualenv
-    echo "export DATABASE_URL=postgresql://haukka:haukka@10.0.2.2/haukka_test?connect_timeout=2" >> ~/.profile
+
+    sudo echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+    sudo apt-get update
+    sudo apt-get install -y postgresql-9.4
+
+    sudo -u postgres createdb haukka_test
+    sudo -u vagrant echo "export DATABASE_URL=postgresql:///haukka_test?connect_timeout=2" >> ~/.profile
+
   SHELL
 end

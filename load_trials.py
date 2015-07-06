@@ -6,7 +6,7 @@ from datetime import datetime
 from pyhaukka.db import ClinicalTrialsDatabase
 from pyhaukka.utils import init_logger
 
-log = init_logger(__name__)
+log = init_logger('load_trials')
 
 def load_trial_xml(file_name):
     db = ClinicalTrialsDatabase()
@@ -24,24 +24,38 @@ def load_trial_xml(file_name):
 def process_new_files():
     valid_count = 0
     error_count = 0
-    print "Processing data/in directory..."
+    if not os.path.exists('data/in'):
+        log.error("Can't find data/in directory!")
+        return
+
+    if not os.path.exists('data/err'):
+        log.error("Can't find data/err directory!")
+        return
+
+    if not os.path.exists('data/out'):
+        log.error("Can't find data/out directory!")
+        return
+
+    log.info("Processing data/in directory...")
     for f in os.listdir('data/in'):
         file_path = 'data/in/{}'.format(f)
         try:
             log.info("Processing {} ...".format(f))
-            if f.endswith('.xml'):
+            if f.lower().endswith('.xml'):
                 load_trial_xml(file_path)
                 valid_count = valid_count + 1
-                log.info("... successfully processed, moving {} to data/out directory...".format(f))
-            elif f.endswith('.zip') or f.endswith('.gz'):
+                log.debug("... successfully processed, moving {} to data/out directory...".format(f))
+                shutil.move(file_path, 'data/out')
+            elif f.lower().endswith('.zip') or f.lower().endswith('.gz'):
                 log.warn("... compressed files aren't supported yet")
-            shutil.move(file_path, 'data/out')
+            else:
+                log.warn("... unsupported file {}".format(f))
         except Exception as ex:
             log.exception("... error processing {}, moving to data/err directory...".format(f))
             shutil.move(file_path, 'data/err/{}.{}'.format(f, datetime.now().strftime("%Y%m%d-%H%M%S")))
             error_count = error_count + 1
 
-    print "Processed {} files.. valid: {} , error: {}".format(valid_count+error_count, valid_count, error_count)
+    log.info("Processed {} files.. valid: {} , error: {}".format(valid_count+error_count, valid_count, error_count))
 
 if __name__ == '__main__':
     process_new_files()

@@ -5,52 +5,73 @@
 haukka helps curators search clinical trials at (http://clinicaltrials.gov) for cancer biomarkers (genes and alterations), and curate them for later reuse. It started as GSoC 2015 project for OncoBlocks organization.
 
 ## pyhaukka
-### Install
+[![Build Status](https://travis-ci.org/mlatief/haukka.svg?branch=pyhaukka-experiment)](https://travis-ci.org/mlatief/haukka)
+
+### Installing with Vagrant
+
+pyhaukka requires [PostgreSQL 9.4](http://www.postgresql.org/) and [Python 2.7](http://python.org/) to be installed first. In this project we are using Vagrant to manage a VirtualBox instance. So first install [VirtualBox](https://www.virtualbox.org/) and [Vagrant](https://www.vagrantup.com/).
+
+Then fire up a ubuntu/trusty64 instance, and will install required packages: PostgreSQL 9.4, Python 2.7, pip and virtualenv.
 
 ```sh
-$ pip install
+$ vagrant up
+$ vagrant ssh
+...
+Host: 127.0.0.1
+Port: 2222
+Username: vagrant
+...
 ```
-pyhaukka requires [PostgreSQL 9.0+](http://www.postgresql.org/) and [Python 2.7](http://python.org/) to be installed first.
 
-#### Install PostgreSQL
-1. Before running pyhaukka app, make sure PostgreSQL server is installed and properly configured.
-2. Create `haukka` user and store the password at `~/.pgpass` (On Windows `%APPDATA%\postgresql\pgpass.conf`)
-3. Then, using default server configurations and after running the above install command, you can run the following tests from haukka root directory to make sure all set:
+After the instance is up and running, SSH to the mentioned port and then while at the home directory:
+
 ```sh
-$ python -m unittest tests.test_db_connection
+$ virtualenv env
+Installing setuptools, pip, wheel...done.
+
+$ source env/bin/activate
+$ cd /vagrant/
+$ pip install -r requirements.txt
+$ py.test tests
 ```
+
+Note that the directory `/vagrant/` inside the virtual box is synced with the project folder at the host (this repository).
 
 ### Run
-* Loading clinical trials from `data/in`
 
+Currently there are two main modules in the project: `pyhaukka` and `load_trials.py`.
+
+* Running a WSGI server
 ```sh
-$ python etl_xml_db.py
+$ python wsgi.py
 ```
 
-* Standalone development server
+Or, using [uWSGI](https://github.com/unbit/uwsgi):
 
 ```sh
-$ python run.py
+$ uwsgi uwsgi.ini
 ```
 
-* uwsgi
-    
-    TODO
+* Loading clinical trials from `./data/in`
+```sh
+$ python load_trials.py
+```
 
-* nginx
-    
-    TODO
+This process will look for new `NCTxxx.xml` files in `./data/in/` and process them sequentially, and move the processed files to `./data/out/` while inserting the trials into the DB. If the process encountered an error processing one file it is moved to `./data/err/`.
 
 ### Sample data for tests
 
-Folder `data` also contains some clinical trials downloaded from http://clinicaltrials.gov to be used while testing.
+Folder `data` contains some clinical trials downloaded from http://clinicaltrials.gov to be used while testing.
 
 ## Status
 
-> * Currently, major parts of pyhaukka DB API is implemented, especially responsible for search. 
+> * Currently, major parts of pyhaukka DB API is implemented, especially the part responsible for search. 
 > * Requests are now wrapped with a Flask-RESTful API. 
 > * Unit tests are created for both DB and Flask app.
 > * Clinical Trials loader is available to load multiple xml files into the DB
+> * Static files are being served smartly (cache ready, gzipped .. etc) using WhiteNoise
+> * Continous integration using TravisCI
+> * Vagrant development environments
 
 #### DB API
 ##### Implemented and tested
@@ -71,15 +92,18 @@ Resource URL | HTTP Verb | Functionality |
 ##### Planned
 Resource URL | HTTP Verb | Functionality 
 -------------| :---------: |---------------
-`/trials/nct_id`   | _GET_      | Retrieve a single trial
-`/trials/nct_id/biomarkers`  | _GET_ | Retrieve clinical trial's biomarkers
-`/trials/nct_id/biomarkers`   | _POST_ | Confirm/Add a biomarker by curator
-`/trials/nct_id/biomarkers`   | _DELETE_ | Removes a biomarker by curator
 `/trials`   | _POST_      | Insert new clinical trial
+`/trials/nct_id`   | _GET_      | Retrieve a single trial
+`/trials/nct_id/biomarkers?type=gner|curator|all`  | _GET_ | Retrieve clinical trial's biomarkers
+`/trials/nct_id/biomarkers`   | _POST_ | Add a biomarker by curator 
+`/trials/nct_id/biomarkers/<bio_marker_slug>`  | _GET_ | Retrieve details about biomarker.
+`/trials/nct_id/biomarkers/<bio_marker_slug>`  | _POST_ | Change biomarker type.
+`/trials/nct_id/biomarkers/<bio_marker_slug>`  | _DELETE_ | Removes a biomarker.
+`/trials/nct_id/biomarkers`  | _GET_ | Retrieve clinical trial's biomarkers.
 
 #### Others
 
 ##### Implemented and tested
 
-* `etl_xml_db.py`: Module to process and load clinical trials xml files into database.
+* `load_trials.py`: Module to process and load clinical trials xml files into database.
 
