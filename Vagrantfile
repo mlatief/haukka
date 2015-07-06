@@ -68,7 +68,9 @@ Vagrant.configure(2) do |config|
     sudo aptitude update
     sudo aptitude -y upgrade
     sudo aptitude install -y build-essential git python-dev python2.7-dev libpq-dev
-    wget https://bootstrap.pypa.io/get-pip.py
+    wget -q https://bootstrap.pypa.io/get-pip.py
     sudo python get-pip.py
+    sudo pip install virtualenv
+    echo "export DATABASE_URL=postgresql://haukka:haukka@10.0.2.2/haukka_test?connect_timeout=2" >> ~/.profile
   SHELL
 end

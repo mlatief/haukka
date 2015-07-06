@@ -1,5 +1,5 @@
 import os
-os.environ['DATABASE_URL'] = os.environ.get('DATABASE_URL', "postgresql://haukka:@localhost/haukka_test")
+os.environ['DATABASE_URL'] = os.environ.get('DATABASE_URL', "postgresql://haukka:@localhost/haukka_test?connect_timeout=5")
 
 import xml.etree.ElementTree as ET
 import unittest
@@ -29,7 +29,7 @@ class HaukkaDbTestCase(unittest.TestCase):
         nct_ids = ['NCT02034110', 'NCT00001160', 'NCT00001163']
         cls.trials = []
         for nctid in nct_ids:
-            with open("data/{}.XML".format(nctid)) as ct:
+            with open("data/{}.xml".format(nctid)) as ct:
                 ct_xml = ct.read()
 
                 m = hashlib.md5()
