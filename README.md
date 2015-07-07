@@ -9,9 +9,9 @@ haukka helps curators search clinical trials at (http://clinicaltrials.gov) for 
 
 ### Installing with Vagrant
 
-pyhaukka requires [PostgreSQL 9.4](http://www.postgresql.org/) and [Python 2.7](http://python.org/) to be installed first. In this project we are using Vagrant to manage a VirtualBox instance. So first install [VirtualBox](https://www.virtualbox.org/) and [Vagrant](https://www.vagrantup.com/).
+pyhaukka requires [PostgreSQL 9.4](http://www.postgresql.org/) and [Python 2.7](http://python.org/) to be installed first.
 
-Then fire up a ubuntu/trusty64 instance, and will install required packages: PostgreSQL 9.4, Python 2.7, pip and virtualenv.
+In this project we are using [Vagrant](https://www.vagrantup.com/) to manage a [VirtualBox](https://www.virtualbox.org/) instance. So you can just start by installing them, then fire up the ubuntu/trusty64 instance, which will install required packages: PostgreSQL 9.4, Python 2.7, pip and virtualenv and create required setup.
 
 ```sh
 $ vagrant up
@@ -23,13 +23,9 @@ Username: vagrant
 ...
 ```
 
-After the instance is up and running, SSH to the mentioned port and then while at the home directory:
+After the instance is up and running, SSH to the mentioned port and then:
 
 ```sh
-$ virtualenv env
-Installing setuptools, pip, wheel...done.
-
-$ source env/bin/activate
 $ cd /vagrant/
 $ pip install -r requirements.txt
 $ py.test tests
@@ -39,9 +35,8 @@ Note that the directory `/vagrant/` inside the virtual box is synced with the pr
 
 ### Run
 
-Currently there are two main modules in the project: `pyhaukka` and `load_trials.py`.
+* Running a development WSGI server
 
-* Running a WSGI server
 ```sh
 $ python wsgi.py
 ```
@@ -52,7 +47,8 @@ Or, using [uWSGI](https://github.com/unbit/uwsgi):
 $ uwsgi uwsgi.ini
 ```
 
-* Loading clinical trials from `./data/in`
+
+* Loading clinical trials from `./data/in` into development DB
 ```sh
 $ python load_trials.py
 ```
@@ -70,7 +66,7 @@ Folder `data` contains some clinical trials downloaded from http://clinicaltrial
 > * Unit tests are created for both DB and Flask app.
 > * Clinical Trials loader is available to load multiple xml files into the DB
 > * Static files are being served smartly (cache ready, gzipped .. etc) using WhiteNoise
-> * Continous integration using TravisCI
+> * Continous integration using [TravisCI](https://travis-ci.org/mlatief/haukka)
 > * Vagrant development environments
 
 #### DB API

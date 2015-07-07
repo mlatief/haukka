@@ -8,4 +8,4 @@ if __name__=='__main__':
         db = db.connect()
         db.execute(open("schema.sql", "r").read())
     except:
-        logging.exception()
+        logging.exception('Error initializing schema!')
