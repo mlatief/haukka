@@ -2,7 +2,7 @@
 
 > Extraction of Clinical Trials Biomarkers
 
-haukka helps curators search clinical trials at (http://clinicaltrials.gov) for cancer biomarkers (genes and alterations), and curate them for later reuse. It started as GSoC 2015 project for OncoBlocks organization.
+*haukka* helps curators search clinical trials at (http://clinicaltrials.gov) for cancer biomarkers (genes and alterations), and curate them for future reference. *haukka* started as GSoC 2015 project for OncoBlocks organization.
 
 ## pyhaukka
 [![Build Status](https://travis-ci.org/mlatief/haukka.svg?branch=pyhaukka-experiment)](https://travis-ci.org/mlatief/haukka)
