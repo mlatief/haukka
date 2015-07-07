@@ -1,12 +1,13 @@
 import xml.etree.ElementTree as ET
 import hashlib
-import os, shutil
+import os
+import shutil
 from datetime import datetime
 
 from pyhaukka.db import ClinicalTrialsDatabase
-from pyhaukka.utils import init_logger
+from utils import init_loggers
 
-log = init_logger('load_trials')
+log = init_loggers(log_file='load_trials.log')
 
 def load_trial_xml(file_name):
     db = ClinicalTrialsDatabase()

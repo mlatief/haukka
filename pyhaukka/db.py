@@ -1,12 +1,12 @@
+import logging
+log = logging.getLogger(__name__)
+
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from utils import init_logger
 import ujson
 from datetime import datetime
 
 from xml_dict import ConvertXmlToDict
-
-log = init_logger('pyhaukka.db')
 
 
 # TODO: Improve paging performance (may be using seek instead of offset!)
@@ -25,7 +25,6 @@ class uJson(psycopg2.extras.Json):
 
 # Custom psycopg2JSON adaptation from PostgreSQL to Python that uses uJson
 loads = lambda x: ujson.loads(x)
-
 
 # Inherit from object: new style classes!
 class ClinicalTrialsDatabase(object):
@@ -46,10 +45,14 @@ class ClinicalTrialsDatabase(object):
 
         if self.conn_uri and self.conn is None:
             log.debug("Connecting to PostgreSQL DB: {}".format(self.conn_uri))
-            self.conn = psycopg2.connect(self.conn_uri, cursor_factory=RealDictCursor)
-            self.conn.autocommit = True
-            psycopg2.extras.register_json(self.conn, loads=loads)
-        else:
+            try:
+                self.conn = psycopg2.connect(self.conn_uri, cursor_factory=RealDictCursor)
+                self.conn.autocommit = True
+                psycopg2.extras.register_json(self.conn, loads=loads)
+            except:
+                log.exception('Error while connecting.')
+                raise
+        elif not self.conn_uri:
             log.warn("Connecting to DB with empty conn_uri! Nothing actually happened!")
 
         return self

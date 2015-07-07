@@ -1,27 +1,33 @@
-import os
-os.environ['DATABASE_URL'] = os.environ.get('DATABASE_URL', "postgresql://haukka:@localhost/haukka_test?connect_timeout=5")
+import utils
+utils.init_loggers(log_file='tests.log')
+
+from config import TEST_DATABASE_URI
 
 import xml.etree.ElementTree as ET
 import unittest
 import hashlib
 import pyhaukka.db
 
-db = pyhaukka.db.ClinicalTrialsDatabase(os.environ['DATABASE_URL'])
-
+db = pyhaukka.db.ClinicalTrialsDatabase(TEST_DATABASE_URI)
 
 class HaukkaDbTestCase(unittest.TestCase):
     def setUp(self):
         self.db = db.connect()
-        # Explicitly start a transaction so changes can be rolled-back at connection close
-        self.db.begin()
-        # Reinitialize clean tables!
-        self.db.execute(open("tests/schema.sql", "r").read())
+        try:
+            # Explicitly start a transaction so changes can be rolled-back at connection close
+            self.db.begin()
+            # Initialize clean tables!
+            self.db.execute(open("schema.sql", "r").read())
+        except:
+            self.db.close()
+            raise
 
     def tearDown(self):
-        self.db.rollback()
-        self.db.close()
-        del self.db
-        self.db = None
+        if self.db.is_connected():
+            self.db.rollback()
+            self.db.close()
+            del self.db
+            self.db = None
 
     @classmethod
     def setUpClass(cls):

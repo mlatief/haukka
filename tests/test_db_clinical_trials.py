@@ -74,6 +74,7 @@ class ClinicalTrialsTestCase(HaukkaDbTestCase):
         self.assertIsNotNone(ct['ctdata'])
         self.assertIsNotNone(ct['rank'])
 
+    @unittest.skip('Biomarkers aliases not yet supported')
     def test_search_clinical_trials_expansion(self):
         q = "BRAF-1" # BRAF, ..
 

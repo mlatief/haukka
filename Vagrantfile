@@ -78,8 +78,20 @@ Vagrant.configure(2) do |config|
     sudo apt-get update
     sudo apt-get install -y postgresql-9.4
 
+    sudo -u postgres createuser vagrant
+    sudo -u postgres createdb haukka
     sudo -u postgres createdb haukka_test
-    sudo -u vagrant echo "export DATABASE_URL=postgresql:///haukka_test?connect_timeout=2" >> ~/.profile
+    sudo -u vagrant psql -d haukka -a -f /vagrant/schema.sql
+
+    sudo -u vagrant echo "export DATABASE_URL=postgresql:///haukka?connect_timeout=2" >> ~/.profile
+    sudo -u vagrant echo "export TEST_DATABASE_URL=postgresql:///haukka_test?connect_timeout=2" >> ~/.profile
+    sudo -u vagrant echo "source ~/env/bin/activate" >> ~/.profile
+    sudo -u vagrant echo "echo Loaded virtual environment!" >> ~/.profile
+
+    sudo -u vagrant echo "python /vagrant/wsgi.py" >> ~/startDev.sh
+    sudo -u vagrant chmod +x ~/startDev.sh
+    sudo -u vagrant echo "uwsgi /vagrant/uwsgi.ini" >> ~/startWSGI.sh
+    sudo -u vagrant chmod +x ~/startWSGI.sh
 
   SHELL
 end

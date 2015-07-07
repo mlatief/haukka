@@ -70,7 +70,3 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE
 ON clinical_trials FOR EACH ROW EXECUTE PROCEDURE ct_search_trigger();
 
---
--- PostgreSQL database dump complete
---
-

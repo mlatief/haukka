@@ -1,8 +1,8 @@
+from config import DATABASE_URI
 import unittest
-import os
 import pyhaukka.db
 
-db = pyhaukka.db.ClinicalTrialsDatabase(os.environ.get('DATABASE_URL'))
+db = pyhaukka.db.ClinicalTrialsDatabase(DATABASE_URI)
 
 
 class ConnectionTestCase(unittest.TestCase):

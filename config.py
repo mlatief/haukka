@@ -4,7 +4,8 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 STATIC_DIR = BASE_DIR + '/haukka-ui'
 STATIC_PREFIX = ''
 
-DATABASE_URI = os.environ.get('DATABASE_URL', "postgresql://haukka:@localhost/haukka?connect_timeout=10")
+DATABASE_URI = os.environ.get('DATABASE_URL', "postgresql:///haukka?connect_timeout=5")
+TEST_DATABASE_URI = os.environ.get('TEST_DATABASE_URL', "postgresql:///haukka_test?connect_timeout=5")
 
 # Enable protection against *Cross-site Request Forgery (CSRF)*
 CSRF_ENABLED     = True

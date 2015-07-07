@@ -1,3 +1,6 @@
+import utils
+utils.init_loggers()
+
 from pyhaukka.app import app
 
 # Run a test server if called as main
