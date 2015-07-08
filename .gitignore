@@ -68,3 +68,4 @@ data/out
 data/err
 
 .vagrant
+.env
