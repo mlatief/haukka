@@ -1,3 +1,4 @@
 {
-  "directory": "haukka-ui/assets/libs"
+  "directory": "haukka-ui/assets/libs",
+  "analytics": false
 }
