@@ -1,5 +1,5 @@
 # Define the Flask WSGI application object
-from flask import Flask, g
+from flask import Flask, g, redirect
 
 app = Flask('pyhaukka')
 
@@ -33,11 +33,15 @@ def close_connection(exception):
 # def not_found(error):
 #    return render_template('404.html'), 404
 
+
+@app.route('/')
+def index_page():
+    return redirect("/index.html")
+
 # Flask-RESTful
 from flask_restful import Api
 api = Api(app)
 
-# Import a module / component using its blueprint handler variable (mod_auth)
 from pyhaukka.resources.trials import Trials
 from pyhaukka.resources.trial import Trial
 
