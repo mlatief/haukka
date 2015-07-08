@@ -8,9 +8,8 @@ class TrialsTestCase(PyhaukkaTestCase):
             rv = c.get('/trials')
             self.check_content_type(rv.headers)
             data = ujson.loads(rv.data)
-            self.assertIsNotNone(data)
-            self.assertIsInstance(data.get('trials'), list)
-            self.assertEqual(len(data['trials']), 0)
+            self.assertIsInstance(data, list)
+            self.assertEqual(len(data), 0)
 
     def test_get_all_trials(self):
         ct_ids = []
@@ -22,9 +21,8 @@ class TrialsTestCase(PyhaukkaTestCase):
             rv = c.get('/trials')
             self.check_content_type(rv.headers)
             data = ujson.loads(rv.data)
-            self.assertIsNotNone(data)
-            self.assertIsInstance(data.get('trials'), list)
-            self.assertEqual(len(data['trials']), 3)
+            self.assertIsInstance(data, list)
+            self.assertEqual(len(data), 3)
 
     def test_query_trials(self):
         ct_ids = []
@@ -37,11 +35,10 @@ class TrialsTestCase(PyhaukkaTestCase):
             self.check_content_type(rv.headers)
 
             data = ujson.loads(rv.data)
-            self.assertIsNotNone(data)
-            self.assertIsInstance(data.get('trials'), list)
-            self.assertEqual(len(data['trials']), 3)
+            self.assertIsInstance(data, list)
+            self.assertEqual(len(data), 3)
 
-            ct = data['trials'][0]
+            ct = data[0]
             self.assertTrue(ct['nctid'] in ct_ids)
             self.assertTrue('0203411' in ct['nctid']) # Ordered by NCTID descending
             self.assertIsNotNone(ct.get('headline'))

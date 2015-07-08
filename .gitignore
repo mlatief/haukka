@@ -69,6 +69,7 @@ data/out
 data/err
 
 .vagrant
+.env
 
 # haukka-ui ignores
 # Logs

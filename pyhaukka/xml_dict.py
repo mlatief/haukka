@@ -109,7 +109,7 @@ def _ConvertXmlToDictRecurse(node, dictclass):
     if node.text is None: 
         text = ''
     else: 
-        text = node.text.strip()
+        text = node.text
     
     if len(nodedict) > 0:            
         # if we have a dictionary add the text as a dictionary value (if there is any)
