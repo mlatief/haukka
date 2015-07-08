@@ -68,6 +68,9 @@ Vagrant.configure(2) do |config|
     sudo aptitude update
     sudo aptitude -y upgrade
     sudo aptitude install -y build-essential git python-dev python2.7-dev libpq-dev
+
+    curl -sL https://deb.nodesource.com/setup | sudo bash -
+    sudo apt-get install -y nodejs
     
     wget --quiet https://bootstrap.pypa.io/get-pip.py
     sudo python get-pip.py
