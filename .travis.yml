@@ -1,6 +1,6 @@
 language: python
 python:
-  - 2.7
+- 2.7
 env:
   global:
   - secure: bpLD2ZHGTXJSPDmIKd4CUsIsF+LSw3ujCRezUPlTP1vo9rQ4ZMN1931gbPpF1EDRoifcecg3+s9BFKPz/7KVEImf59n2WM/iqSmrUm+lf7oGXeGKPZOdTfxH2p7Vg8Y1qAgGrIEFvF0mTEn5DxRMqcwcs8lWVtAAUsJmmuGhkXBkBHLpvpOOjVBcG7tbHFp5WIFRPOEqrCNNIa7pN3OxW1Hi7lMsu/m8g1j+SKVn67m6pas75IthuJJv/IYYAMVA8pcIMLFfVulBnDLin5OrJfOr/DHzicF5CYC2kPDpgMgEh6YtEdycA7o9z49/6rPqJnSZiG208SzBS+M8WFhAuk5sZMVSdzddkp3X4YB0TVTzdGisiUXIXHZOp7To4jE69reQ/CoEegy63WZ1h9ZaUl7M6p0aYJMq4Zes6KMOB4rlx/abBkpXdMQPGNAy/4sHUM9N8dfj0VufgIdZ676eq2QYCLM5LkmJF30SPq6zci/ybBd/O2Uu4O8PtWhEOp/B9pD5InfU9vNQ83rj6mus+PLYfrp9WQrL36ZB1cxtAGRuYmFHe07LT9AdtHQH9CezhNFoZAzm17Q5QTBXWdDgTCQgIFnzpAQx6q5tU4d/mOzitdq4I9+szsmUoVUF+oMoVowtWXChTQSwOEJqArsd18DqKCard/JOG7I5g7ZlQes=
@@ -8,12 +8,18 @@ env:
   - DATABASE_URL: postgresql://postgres:@localhost/haukka_test
   - TEST_DATABASE_URL: postgresql://postgres:@localhost/haukka_test
 services:
-  - postgresql
+- postgresql
 addons:
-  postgresql: "9.4"
+  postgresql: '9.4'
 install:
-  - pip install -q -r requirements.txt
+- pip install -q -r requirements.txt
 before_script:
-  - psql -c 'create database haukka_test;' -U postgres
+- psql -c 'create database haukka_test;' -U postgres
 script:
-  - py.test tests
+- py.test tests
+deploy:
+  provider: heroku
+  app: 
+    master: pyhaukka
+  api_key:
+    secure: fk20RnW4NPFFWPlGfm5PLBNJfe/6+Q/EduwHfBwj84OnsRDkLpI59b9cTShWlEY/KlC0w9hQYXkL3m/4S98CacCi41whZSYJEmNpc7q+xLQGb5nfSpPQUyUKIOFij81qFKDchSmJ6/kIK19BAvP5FdkUs1eZ6OkcSIIHIgo+6MF4dt/VpSyib3WjIzagVUvQo8Sue1F991zyox1PLNqrPz82clYsEEcffGZuraP3YkzA+57TqrZlcz0tkV3Zp8ZjpU4ByfDnAku1vrINJ1SAsMhknPBIdZPbhEko/TlnOGVP7OGddqMxJPfyUHZybnzC/bZwU0CRPGSmYBwrNByluM+PrKRFFmc15nMQPMsUIxArrdOjH5cLxJI19FS3FeDo/GEVlhp1IZcP7bWfgL4ueTrEzk4oOmGZRgPkBlYtGZZBHUkynZ7sAEAaYjtSIppqiqEE4MXpzDpV5dD0gE0JLtZNRHCABf/jrscbVydibK5FDJuj4V+V5wL6NYlhz9aFQlHBe/Q15776U/MKZyAVTkeCt9y3SEr+rqEA4Ghb2qYZ/MGC1pphlumCGuKuGUT9egTm/s+WCdfWVYiV2gKueqpooo0XW/RTxIFuDkE2BVMGYBFnff+E2zKpscT1MO3LCDG0KnSHlxxTaSu80h9tKdk02+AgfD447xxVUdFaZv8=
