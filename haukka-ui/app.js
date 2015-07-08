@@ -3,9 +3,9 @@
 // Declare app level module which depends on views, and components
 angular.module('haukka', [
   'ui.router',
+  'haukka.trials.service', /* Use haukka.trials.service for communication with server */
   'haukka.trials',
-  'haukka.widgets',
-  'haukka.trials.service.sample' /* Use haukka.trials.service for communication with server */
+  'haukka.widgets'
 ])
 .run(function ($rootScope, $state, $stateParams) {
   /* Provide convenient $state/$stateParams in templates and directives */
@@ -35,8 +35,8 @@ angular.module('haukka', [
   .state('trials.search', {
     url: '?query',
     resolve: {
-      trials: ['$stateParams', 'TrialsService', function($stateParams, TrialsService){
-        return TrialsService.searchTrials($stateParams.query);
+      trials: ['$stateParams', 'Trials', function($stateParams, Trials){
+        return Trials.query({'q':$stateParams.query});
       }]
     },
     templateUrl: 'trials/trials.list.html',
@@ -45,8 +45,8 @@ angular.module('haukka', [
   .state('trials.detail', {
       url:'/{nctid}',
       resolve: {
-        trial: ['$stateParams', 'TrialsService', function($stateParams, TrialsService){
-          return TrialsService.getTrial($stateParams.nctid);
+        trial: ['$stateParams', 'Trials', function($stateParams, Trials){
+          return Trials.get({'trialId':$stateParams.nctid});
         }]
       },
       templateUrl: 'trials/trials.detail.html',

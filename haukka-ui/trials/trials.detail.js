@@ -6,9 +6,9 @@
 
     function TrialDetailController($stateParams, trial){
         console.log('TrialDetailController nctid: ', $stateParams.nctid);
-        console.log('Trial data:', trial.data.clinical_study);
+        console.log('Trial data:', trial);
         this.nctid = $stateParams.nctid;
-        this.trial = trial.data.clinical_study;
+        this.trial = trial.clinical_study;
     }
 
 })();
