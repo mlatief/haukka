@@ -20,4 +20,4 @@ class Trials(Resource):
         else:
             r = db.get_all_clinical_trials(l, o)
 
-        return {'trials':r}
+        return r
