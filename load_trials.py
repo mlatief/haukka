@@ -3,14 +3,21 @@ import hashlib
 import os
 import shutil
 from datetime import datetime
-
+import logging
+from config import DATABASE_URI
 from pyhaukka.db import ClinicalTrialsDatabase
-from utils import init_loggers
 
-log = init_loggers(log_file='load_trials.log')
+print "Running on Heroku? ", os.environ.get('HEROKU')
+
+import utils
+utils.init_loggers(log_file='load_trials.log')
+
+log = logging.getLogger()
+db = ClinicalTrialsDatabase(DATABASE_URI)
+print "Connecting to database", DATABASE_URI
+db.connect()
 
 def load_trial_xml(file_name):
-    db = ClinicalTrialsDatabase()
     with open(file_name, "r") as ct:
         ct_xml = ct.read()
 
