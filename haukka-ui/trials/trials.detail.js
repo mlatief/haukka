@@ -2,9 +2,9 @@
   'use strict';
 
   function TrialDetailController($stateParams, trial) {
-    console.log('TrialDetailController nctid: ', $stateParams.nctid);
-    console.log('Trial data:', trial);
-    //console.log('Query string: ', query);
+    console.log('trials.detail: TrialDetailController nctid: ', $stateParams.nctid);
+    console.log('trials.detail: Trial data:', trial);
+    console.log('trials.detail: Highlight markers: ', $stateParams.highlight);
     
     this.nctid = $stateParams.nctid;
     if (!Array.isArray(trial.clinical_study.condition)) {

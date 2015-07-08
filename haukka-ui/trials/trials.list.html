@@ -11,7 +11,7 @@
             <query query-string="vm.queryString"></query>
         </div>
         <div class="list-group">
-            <trial-row ng-repeat="r in vm.results" trial="r"></trial-row>
+            <trial-row ng-repeat="r in vm.results" trial="r" highlight="vm.queryString"></trial-row>
         </div>
         
     </div>

@@ -45,7 +45,7 @@
             controller: 'TrialsListController as vm'
           })
           .state('trials.detail', {
-            url: '/{nctid}',
+            url: '/{nctid}?highlight',
             resolve: {
               trial: ['$stateParams', 'Trials', function ($stateParams, Trials) {
                 return Trials.get({'trialId': $stateParams.nctid}).$promise;

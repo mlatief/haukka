@@ -6,7 +6,8 @@
       return {
         templateUrl: '/trials/trial-row.directive.html',
         scope: {
-          'trial': '='
+          'trial': '=',
+          'highlight': '='
         }
       };
     });
