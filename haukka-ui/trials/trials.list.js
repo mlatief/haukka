@@ -2,14 +2,14 @@
     'use strict';
     
     angular.module('haukka.trials')
-    .controller('TrialsListController', ['$stateParams','trials', TrialsListController]);
+    .controller('TrialsListController', ['$stateParams','results', TrialsListController]);
 
-    function TrialsListController($stateParams, trials){
+    function TrialsListController($stateParams, results){
         console.log('TrialsController query: ', $stateParams.query);
-        console.log('Trials count: ', trials.data.length);
+        console.log('Trials count: ', results.length);
         
         this.queryString = $stateParams.query;
-        this.trials = trials.data;
+        this.results = results;
     }
 
 })();

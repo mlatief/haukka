@@ -1,11 +1,4 @@
-<div class="col-sm-2 side-bar">
-    <h4>Refine by</h4>
-    <!--
-    <trials-refine filter-heading="Location"></trials-refine>
-    <trials-refine filter-heading="Gene Type"></trials-refine>
-    -->
-</div>
-<div class="col-sm-10">
+<div class="col-sm-12">
     <div class="row">
         <div class="col-sm-12">
         </div>
@@ -18,10 +11,8 @@
             <query query-string="vm.queryString"></query>
         </div>
         <div class="list-group">
-            
-            <trial-row ng-repeat="t in vm.trials" trial="t.clinical_study"></trial-row>
-
+            <trial-row ng-repeat="r in vm.results" trial="r" highlight="vm.queryString"></trial-row>
         </div>
-        <div class="panel-footer"></div>
+        
     </div>
 </div>
