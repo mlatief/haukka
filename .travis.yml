@@ -17,9 +17,3 @@ before_script:
 - psql -c 'create database haukka_test;' -U postgres
 script:
 - py.test tests
-deploy:
-  provider: heroku
-  app: 
-    master: pyhaukka
-  api_key:
-    secure: fk20RnW4NPFFWPlGfm5PLBNJfe/6+Q/EduwHfBwj84OnsRDkLpI59b9cTShWlEY/KlC0w9hQYXkL3m/4S98CacCi41whZSYJEmNpc7q+xLQGb5nfSpPQUyUKIOFij81qFKDchSmJ6/kIK19BAvP5FdkUs1eZ6OkcSIIHIgo+6MF4dt/VpSyib3WjIzagVUvQo8Sue1F991zyox1PLNqrPz82clYsEEcffGZuraP3YkzA+57TqrZlcz0tkV3Zp8ZjpU4ByfDnAku1vrINJ1SAsMhknPBIdZPbhEko/TlnOGVP7OGddqMxJPfyUHZybnzC/bZwU0CRPGSmYBwrNByluM+PrKRFFmc15nMQPMsUIxArrdOjH5cLxJI19FS3FeDo/GEVlhp1IZcP7bWfgL4ueTrEzk4oOmGZRgPkBlYtGZZBHUkynZ7sAEAaYjtSIppqiqEE4MXpzDpV5dD0gE0JLtZNRHCABf/jrscbVydibK5FDJuj4V+V5wL6NYlhz9aFQlHBe/Q15776U/MKZyAVTkeCt9y3SEr+rqEA4Ghb2qYZ/MGC1pphlumCGuKuGUT9egTm/s+WCdfWVYiV2gKueqpooo0XW/RTxIFuDkE2BVMGYBFnff+E2zKpscT1MO3LCDG0KnSHlxxTaSu80h9tKdk02+AgfD447xxVUdFaZv8=
