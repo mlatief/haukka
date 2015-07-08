@@ -2,14 +2,20 @@
     <div class="panel panel-default">
         <!-- Default panel contents -->
         <div class="panel-heading">
-            <h2 ng-bind="vm.nctid"></h2>
+                <div class="pull-right alert" role="alert" 
+                    ng-class="vm.trial_status_class" ng-bind="vm.trial_status"></div>
+            <h5 ng-bind="vm.nctid"></h5>
+            <h4 ng-bind="vm.trial.clinical_study.official_title"></h4>
         </div>
         <div class="panel-body">
-            <h4 ng-bind="vm.trial.official_title"></h4>
-            <h5>Description</h5>
-            <p ng-bind="vm.trial.detailed_description"></p>
-            <h5>Eligibility</h5>
-            <p class="with-newlines" ng-bind="vm.trial.eligibility.criteria.textblock"></p>
+            <h4>Purpose</h4>
+            <p class="with-newlines" ng-bind="vm.trial.clinical_study.brief_summary.textblock"></p>
+            <h4>Condition</h4>
+            <ul>
+                <li ng-repeat="c in vm.trial.clinical_study.condition" ng-bind="c"></li>
+            </ul>
+            <h4>Eligibility</h4>
+            <p class="with-newlines" ng-bind="vm.trial.clinical_study.eligibility.criteria.textblock"></p>
         </div>
     </div>
 </div>
