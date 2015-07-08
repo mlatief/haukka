@@ -4,7 +4,7 @@
   "authors": [
     "Mohamed Abdellatif <m.latief@gmail.com>"
   ],
-  "description": "ClinicalTrials.gov query interface",
+  "description": "UI for pyhaukka using AngularJS",
   "license": "MIT",
   "ignore": [
     "**/.*",
