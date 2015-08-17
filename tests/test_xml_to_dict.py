@@ -1,30 +1,13 @@
 import unittest
-import hashlib
-import xml.etree.ElementTree as ET
 from pyhaukka.converter import convert_xml_to_dict
 
 class XmlToDictTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        from fixture import load_sample_trials
         # Load test trials fixtures from xml files
         nct_ids = ['NCT02034110', 'NCT00001160', 'NCT00001163']
-        cls.trials = []
-        for nctid in nct_ids:
-            with open("data/{}.xml".format(nctid)) as ct:
-                ct_xml = ct.read()
-
-                m = hashlib.md5()
-                m.update(ct_xml)
-                ct_checksum = m.hexdigest()
-
-                root = ET.fromstring(ct_xml)
-                ct_status = root.findtext('./overall_status')
-                trial = {'id': nctid, 'xml': ct_xml, 'status': ct_status, 'checksum': ct_checksum}
-                cls.trials.append(trial)
-
-        if len(cls.trials) < len(nct_ids):
-            raise Exception("Couldn't read all test data...")
-
+        cls.trials = load_sample_trials(nct_ids)
 
     def test_converter_handle_flat_dict(self):
         xml = '<ct><title>sample trial title</title><purpose>sample trial purpose</purpose></ct>'
