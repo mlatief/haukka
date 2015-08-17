@@ -1,4 +1,4 @@
-import utils
+from pyhaukka import utils
 utils.init_loggers()
 
 from pyhaukka.app import app

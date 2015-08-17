@@ -1,23 +1,26 @@
 from flask_restful import Resource, reqparse
-from pyhaukka.app import get_db
-
-parser = reqparse.RequestParser()
-parser.add_argument('q', type=str)
-parser.add_argument('limit', type=int, default=20)
-parser.add_argument('offset', type=int, default=0)
+import ujson
 
 class Trials(Resource):
     def get(self):
+        from pyhaukka.app import app, db
+        from pyhaukka.models import Trial
+
         # Query parameters: q=None, offset=0, limit=20
-        db = get_db()
+        parser = reqparse.RequestParser()
+        parser.add_argument('q', type=str, help='Biomarkers query')
         args = parser.parse_args()
         q = args['q']
-        l = args['limit']
-        o = args['offset']
+        print "Request with query: ", q
+        all_trials = db.session.query(Trial).all()
+        trials=[ct.get_json() for ct in all_trials]
+        return trials
 
-        if q :
-            r = db.search_clinical_trials(q, l, o)
-        else:
-            r = db.get_all_clinical_trials(l, o)
+class TrialResource(Resource):
+    def get(self, trial_id):
+        from pyhaukka.app import db
+        from pyhaukka.models import Trial
 
-        return r
+        q = db.session.query(Trial)
+        r = q.get(trial_id)
+        return r.get_json()

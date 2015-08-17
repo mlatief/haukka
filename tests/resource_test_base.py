@@ -1,20 +1,28 @@
-import logging
-log = logging.getLogger(__name__)
+from pyhaukka.utils import init_loggers
+init_loggers(log_file='tests.log')
 
-from pyhaukka.app import app
-from db_test_base import HaukkaDbTestCase
+from flask.ext.sqlalchemy import SQLAlchemy
+import unittest
+from pyhaukka.app import app, db
+from config import TEST_DATABASE_URI
 
-class PyhaukkaTestCase(HaukkaDbTestCase):
+from pyhaukka.models import Trial
+
+class ResourcesTestCase(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        from fixture import load_sample_trials
+        # Load test trials fixtures from xml files
+        nct_ids = ['NCT02034110', 'NCT00001160', 'NCT00001163']
+        cls.trials = load_sample_trials(nct_ids)
+
     def setUp(self):
-        super(PyhaukkaTestCase, self).setUp()
-        app.db = self.db
-        self.app = app
+        app.config['SQLALCHEMY_DATABASE_URI'] = TEST_DATABASE_URI
+        db.create_all()
 
     def tearDown(self):
-        # Rollback should have been performed since AppContext should close the connection without a commit!
-        if self.db.is_connected():
-            log.warn('Connection is still open, attempting to close connection...')
-            self.db.close()
+        db.session.rollback()
+        db.session.close()
 
     def check_content_type(self, headers):
       self.assertEqual(headers['Content-Type'], 'application/json')
