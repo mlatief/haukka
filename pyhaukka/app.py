@@ -35,9 +35,13 @@ from flask_restful import Api
 api = Api(app)
 
 from pyhaukka.resources.trials import Trials, TrialResource
+from pyhaukka.resources.tasks import Tasks, Task
 
 # Register endpoint(s)
 api.add_resource(Trials,  '/trials')
 api.add_resource(TrialResource,  '/trials/<string:trial_id>')
+
+api.add_resource(Tasks,  '/tasks')
+api.add_resource(Task,  '/tasks/<string:task_id>')
 
 app.logger.info('Initialized web app!')

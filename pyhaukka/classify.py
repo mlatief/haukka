@@ -71,6 +71,5 @@ def load_pickled(root="nltk_data/classifiers", fname="biomarker_classifier.pickl
     import pickle
     import os
     fpath = os.path.join(root, fname)
-    with open(fpath, "rb") as f:
-        c = pickle.load(f)
+    c = pickle.load(file(fpath))
     return c
