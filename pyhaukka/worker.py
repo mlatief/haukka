@@ -1,9 +1,9 @@
 from celery import Celery
-import pyhaukka.classify
 
 celery_app = Celery(__name__)
 celery_app.config_from_object('celeryconfig')
 
+import pyhaukka.classify
 classifier = pyhaukka.classify.load_pickled()
 
 @celery_app.task(bind=True)
@@ -37,6 +37,8 @@ def process_trial(self, url):
 
         self.update_state(state='PROGRESS', meta={'status': "Tagging Biomarkers" })
         tags = classifier.tag(raw)
+
+        self.update_state(state='PROGRESS', meta={'status': "Collecting Biomarkers" })
         gner = [(t,v) for (t,v) in tags if v == 'BIO']
 
         self.update_state(state='PROGRESS', meta={'status': "Storing clinical trial" })
@@ -51,3 +53,4 @@ def process_trial(self, url):
         return {'status': 'Trial processed!', 'result': nct_id}
 
     raise urllib2.URLError(reason="URL returned no response")
+
