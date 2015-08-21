@@ -4,13 +4,19 @@ from nltk.corpus import words, stopwords
 
 from nltk.tokenize import wordpunct_tokenize
 
+import unicodedata, sys
 corpus_root = "nltk_data/corpora/"
 classifier_root = "nltk_data/classifiers"
 
-cbio_corpus = PlaintextCorpusReader(corpus_root + '/cbio_cancer_genes', fileids=".+\\.txt")
+line_tokenizer = nltk.tokenize.simple.LineTokenizer()
+cbio_corpus = PlaintextCorpusReader(corpus_root + '/cbio_cancer_genes', fileids=".+\\.txt",
+                                    word_tokenizer=line_tokenizer)
 
 cbio_words = list(cbio_corpus.words())
 en_words = list(words.words())
+stop_words = stopwords.words()
+
+punct = dict.fromkeys(i for i in range(sys.maxunicode) if unicodedata.category(unichr(i)).startswith(u'P'))
 
 def bio_chunk_features(word):
     import re
@@ -20,8 +26,10 @@ def bio_chunk_features(word):
     cbio = word in cbio_words
     all_caps = word.isupper()
     en_word = word_lower in en_words
-    #stop_word = word_lower in stopwords.words()
+    stop_word = word_lower in stop_words
     has_digits = bool(_digits.search(word_lower))
+    word_len = len(word_lower)
+    all_digits = word.isdigit()
 
     # TODO: Add features such as:
     # - Followed by words such as mutations, wild-type, alteration
@@ -30,9 +38,11 @@ def bio_chunk_features(word):
 
     return {"cbio": cbio,
             "word": en_word,
-            #"stop_word": stop_word,
+            "stop_word": stop_word,
             "all_caps": all_caps,
-            "has_digits": has_digits}
+            "has_digits": has_digits,
+            "all_digits": all_digits,
+            "word_len": word_len}
 
 
 class BiomarkerClassifier(nltk.TaggerI):
@@ -75,9 +85,12 @@ class BiomarkerClassifier(nltk.TaggerI):
         sent_tokenized = wordpunct_tokenize(sentence)
         #feats = [bio_chunk_features(word) for word in sent_tokenized]
         #feats = [pool.apply(bio_chunk_features, args=(word,)) for word in sent_tokenized]
-        feats = self.fast_calculate_features(sent_tokenized)
+        stripped = [s.translate(punct) for s in sent_tokenized]
+        words = filter(None, stripped)
+        feats = self.fast_calculate_features(words)
         tags = self.classifier.classify_many(feats)
-        conll = zip(sent_tokenized, tags)
+        conll = zip(words, tags)
+        print conll
         return conll
 
 def store_pickled(classifier, root="nltk_data/classifiers", fname="biomarker_classifier.pickle"):

@@ -33,12 +33,12 @@ def process_trial(self, url):
                 raise ValueError("Duplicate trial with the same data found")
 
         self.update_state(state='PROGRESS', meta={'status': "Extracting RAW text" })
-        raw = BeautifulSoup(r.text, "html.parser").get_text()
+        bs = BeautifulSoup(r.text, "xml")
+        bio_tags = bs.find_all(['official_title','brief_summary','detailed_description', 'keyword', 'criteria'])
+        raw = "\n".join(b.get_text() for b in bio_tags)
 
         self.update_state(state='PROGRESS', meta={'status': "Tagging Biomarkers" })
         tags = classifier.tag(raw)
-
-        self.update_state(state='PROGRESS', meta={'status': "Collecting Biomarkers" })
         gner = [(t,v) for (t,v) in tags if v == 'BIO']
 
         self.update_state(state='PROGRESS', meta={'status': "Storing clinical trial" })
@@ -49,7 +49,6 @@ def process_trial(self, url):
             trial = Trial(ct_dict=trial_dict, ners=gner)
             db.session.add(trial)
 
-        db.session.commit()
         return {'status': 'Trial processed!', 'result': nct_id}
 
     raise urllib2.URLError(reason="URL returned no response")

@@ -17,13 +17,6 @@ def init_loggers(log_file='app.log', level=logging.DEBUG):
 
     logger.setLevel(level)
 
-def print_elapsed(start):
-    import time
-    cur = time.clock()
-    print("   {:03.2f} secs elapsed".format(cur-start))
-    return cur
-
-
 def dicts_subset_filter(d, subset, ignore_keys=[]):
     '''
     Checks if b is subset of a
