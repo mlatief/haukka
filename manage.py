@@ -15,7 +15,7 @@ init_loggers("admin.log")
 
 @manager.command
 def train(corpus_path="nltk_data/corpora/clinical_trials", files=".+\\.txt",
-          output="nltk_data/classifier"):
+          output="nltk_data/classifiers"):
     """
     Trains a classifier using the provided corpus and dumps the class in the output file
     """

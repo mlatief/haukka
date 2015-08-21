@@ -6,8 +6,8 @@ from pyhaukka.classify import BiomarkerClassifier, store_pickled, load_pickled
 class ClassifierTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        train = "Diagnosis of locally advanced or metastatic melanoma along " \
-                "with written documentation of [BRAF V600] mutation."
+        train = u"Diagnosis of locally advanced or metastatic melanoma along " \
+                u"with written documentation of [BRAF V600] mutation."
         train_tree = nltk.chunk.tagstr2tree(train, chunk_label="BIO")
         cls.classifier = BiomarkerClassifier(train_tree)
 
@@ -15,19 +15,19 @@ class ClassifierTestCase(unittest.TestCase):
         assert self.classifier.classifier is not None
 
     def test_tag(self):
-        test = "Subjects will need to have " \
-               "a fresh or frozen tumor tissue sample provided to confirm the BRAF V600E mutation status."
+        test = u"Subjects will need to have " \
+               u"a fresh or frozen tumor tissue sample provided to confirm the BRAF V600E mutation status."
         tags = self.classifier.tag(test)
         assert tags[16] == ('BRAF', 'BIO')
         assert tags[17] == ('V600E', 'BIO')
 
     def test_tag_MET(self):
-        test = "Crizotinib in Pretreated Metastatic Non-small-cell Lung Cancer With MET Amplification"
+        test = u"Crizotinib in Pretreated Metastatic Non-small-cell Lung Cancer With MET Amplification"
         tags = self.classifier.tag(test)
-        assert tags[12] == ('MET', 'BIO')
+        assert tags[10] == ('MET', 'BIO')
 
     def test_tag_met_en(self):
-        test = "within the same liver segment as long as the dose constraints to normal tissue can be met"
+        test = u"within the same liver segment as long as the dose constraints to normal tissue can be met"
         tags = self.classifier.tag(test)
 
         assert tags[-1] == ('met', 'O')
@@ -42,8 +42,8 @@ class ClassifierTestCase(unittest.TestCase):
         test_cl = load_pickled(root="nltk_data/classifiers/", fname="test_biomarker_classifier.pickle")
         assert test_cl is not None
 
-        test = "Subjects will need to have " \
-               "a fresh or frozen tumor tissue sample provided to confirm the BRAF V600E mutation status."
+        test = u"Subjects will need to have " \
+               u"a fresh or frozen tumor tissue sample provided to confirm the BRAF V600E mutation status."
         tags = test_cl.tag(test)
         assert tags[16] == ('BRAF', 'BIO')
         assert tags[17] == ('V600E', 'BIO')

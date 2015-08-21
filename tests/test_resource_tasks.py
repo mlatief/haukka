@@ -17,7 +17,7 @@ class TasksTestCase(ResourcesTestCase):
             assert id is not None
             t = process_trial.AsyncResult(id)
             assert t is not None
-            assert t.state in ['PENDING', 'FAILURE', 'SUCCESS']
+            assert t.state in ['PROGRESS', 'PENDING', 'FAILURE', 'SUCCESS']
             print t.state
 
     def test_get_task(self):
@@ -29,7 +29,7 @@ class TasksTestCase(ResourcesTestCase):
             self.check_content_type(rv.headers)
             data = ujson.loads(rv.data)
             assert data is not None
-            assert data['state'] in ['PENDING', 'FAILURE', 'SUCCESS']
+            assert data['state'] in ['PROGRESS', 'PENDING', 'FAILURE', 'SUCCESS']
             assert data['status'] is not None
             print data['state']
             print data['status']
