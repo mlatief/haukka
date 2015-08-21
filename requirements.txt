@@ -8,8 +8,10 @@ Flask-Migrate==1.4.0
 Flask-RESTful==0.3.3
 Flask-Script==2.0.5
 Flask-SQLAlchemy==2.0
+httmock==1.2.3
 itsdangerous==0.24
 Jinja2==2.7.3
+lxml==3.4.4
 Mako==1.0.1
 MarkupSafe==0.23
 nltk==3.0.4

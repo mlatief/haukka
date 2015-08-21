@@ -1,4 +1,4 @@
-from pyhaukka.utils import init_loggers, print_elapsed
+from pyhaukka.utils import init_loggers
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
 import logging
@@ -12,6 +12,12 @@ manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 
 init_loggers("admin.log")
+
+def print_elapsed(start):
+    import time
+    cur = time.clock()
+    logging.info("   {:03.2f} secs elapsed".format(cur-start))
+    return cur
 
 @manager.command
 def train(corpus_path="nltk_data/corpora/clinical_trials", files=".+\\.txt",

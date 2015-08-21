@@ -1,10 +1,9 @@
 from flask_restful import Resource, reqparse, inputs
 from flask import Response
 
-from pyhaukka.worker import process_trial
-
 class Tasks(Resource):
     def post(self):
+        from pyhaukka.worker import process_trial
         from pyhaukka.app import api
         parser = reqparse.RequestParser()
         parser.add_argument('url', type=inputs.url)
@@ -17,6 +16,9 @@ class Tasks(Resource):
 
 class Task(Resource):
     def get(self, task_id):
+        from pyhaukka.worker import process_trial
+        from pyhaukka.worker import celery_app
+        print celery_app.conf.CELERY_ALWAYS_EAGER
         task = process_trial.AsyncResult(task_id)
         if task.state == 'PENDING':
             response = {
