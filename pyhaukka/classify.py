@@ -4,6 +4,9 @@ from nltk.corpus import words, stopwords
 
 from nltk.tokenize import wordpunct_tokenize
 
+import billiard
+pool = billiard.Pool(4)
+
 corpus_root = "nltk_data/corpora/"
 classifier_root = "nltk_data/classifiers"
 
@@ -11,6 +14,29 @@ cbio_corpus = PlaintextCorpusReader(corpus_root + '/cbio_cancer_genes', fileids=
 
 cbio_words = list(cbio_corpus.words())
 en_words = list(words.words())
+
+def bio_chunk_features(word):
+    import re
+    _digits = re.compile('\d')
+    word_lower = word.lower()
+
+    cbio = word in cbio_words
+    all_caps = word.isupper()
+    en_word = word_lower in en_words
+    #stop_word = word_lower in stopwords.words()
+    has_digits = bool(_digits.search(word_lower))
+
+    # TODO: Add features such as:
+    # - Followed by words such as mutations, wild-type, alteration
+    # - Distance from such words
+    # - Frequency distribution
+
+    return {"cbio": cbio,
+            "word": en_word,
+            #"stop_word": stop_word,
+            "all_caps": all_caps,
+            "has_digits": has_digits}
+
 
 class BiomarkerClassifier(nltk.TaggerI):
     def __init__(self, chunked_trial):
@@ -23,11 +49,9 @@ class BiomarkerClassifier(nltk.TaggerI):
         self.classifier = nltk.NaiveBayesClassifier.train(train_set)
 
     def fast_calculate_features(self, words):
-        from pyhaukka.worker import bio_chunk_features
-        from celery import group
-        job = group(bio_chunk_features.s(w) for w in words)
-        result = job.apply_async()
-        feats = result.get()
+        feats  = pool.map(bio_chunk_features, words)
+        #result = job.apply_async()
+        #feats = result.get()
         return feats
 
     def get_features_from_chunk(self, chunks_tree):
