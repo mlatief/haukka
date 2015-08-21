@@ -17,6 +17,12 @@ def init_loggers(log_file='app.log', level=logging.DEBUG):
 
     logger.setLevel(level)
 
+def print_elapsed(start):
+    import time
+    cur = time.clock()
+    print("   {:03.2f} secs elapsed".format(cur-start))
+    return cur
+
 
 def dicts_subset_filter(d, subset, ignore_keys=[]):
     '''
@@ -26,14 +32,18 @@ def dicts_subset_filter(d, subset, ignore_keys=[]):
     kb = set(subset).difference(ignore_keys)
     return kb.issubset(ka) and all(d[k] == subset[k] for k in kb)
 
-def get_trial_json(trial_id):
-    from pyhaukka.xml_dict import ConvertXmlToDict
-    import ujson
-    '''
-    Convert a trial xml to json and print it out    
-    '''
-    file_name = "data/{}.xml".format(trial_id)
-    with open(file_name, "r") as ct:
-        ct_xml = ct.read()
-        ct_dict = ConvertXmlToDict(ct_xml)
-        print ujson.dumps(ct_dict)
+def convert_trial_xml_to_json(xml):
+    from pyhaukka.converter import convert_xml_to_dict
+    mapping = {'nct_id': './id_info/nct_id',
+               'title': './official_title',
+               'brief_summary': './brief_summary/textblock',
+               'detailed_description': './detailed_description/textblock',
+               'condition': ['./condition'],
+               'overall_status': './overall_status',
+               'location': ['./location_countries/country'],
+               'keywords': ['./keyword'],
+               'lastchanged_date': './lastchanged_date',
+               'criteria': './eligibility/criteria/textblock'}
+    d = convert_xml_to_dict(mapping, xml)
+    return d
+

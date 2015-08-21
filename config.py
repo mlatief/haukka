@@ -7,6 +7,8 @@ STATIC_PREFIX = ''
 DATABASE_URI = os.environ.get('DATABASE_URL', "postgresql:///haukka?connect_timeout=5")
 TEST_DATABASE_URI = os.environ.get('TEST_DATABASE_URL', "postgresql:///haukka_test?connect_timeout=5")
 
+SQLALCHEMY_DATABASE_URI = DATABASE_URI
+
 # Enable protection against *Cross-site Request Forgery (CSRF)*
 CSRF_ENABLED     = True
 # Secret key for signing cookies
