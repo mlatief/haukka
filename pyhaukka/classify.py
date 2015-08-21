@@ -4,9 +4,6 @@ from nltk.corpus import words, stopwords
 
 from nltk.tokenize import wordpunct_tokenize
 
-import billiard
-pool = billiard.Pool(4)
-
 corpus_root = "nltk_data/corpora/"
 classifier_root = "nltk_data/classifiers"
 
@@ -49,7 +46,10 @@ class BiomarkerClassifier(nltk.TaggerI):
         self.classifier = nltk.NaiveBayesClassifier.train(train_set)
 
     def fast_calculate_features(self, words):
+        import billiard
+        pool = billiard.Pool(4)
         feats  = pool.map(bio_chunk_features, words)
+        pool.close()
         #result = job.apply_async()
         #feats = result.get()
         return feats
@@ -84,7 +84,7 @@ def store_pickled(classifier, root="nltk_data/classifiers", fname="biomarker_cla
     import pickle
     import os
     fpath = os.path.join(root, fname)
-    with open(fpath, "wb") as f:
+    with open(fpath, "wb+") as f:
         pickle.dump(classifier, f)
 
 def load_pickled(root="nltk_data/classifiers", fname="biomarker_classifier.pickle"):
