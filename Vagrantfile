@@ -67,34 +67,39 @@ Vagrant.configure(2) do |config|
   config.vm.provision "shell", inline: <<-SHELL
     sudo aptitude update
     sudo aptitude -y upgrade
-    sudo aptitude install -y build-essential git python-dev python2.7-dev libpq-dev
+    sudo aptitude install -y build-essential git python-dev python2.7-dev libpq-dev tcl8.5
 
     curl -sL https://deb.nodesource.com/setup | sudo bash -
     sudo apt-get install -y nodejs
     
     wget --quiet https://bootstrap.pypa.io/get-pip.py
     sudo python get-pip.py
-    sudo pip install virtualenv
 
     sudo echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" > /etc/apt/sources.list.d/pgdg.list
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
     sudo apt-get update
     sudo apt-get install -y postgresql-9.4
 
+    wget http://download.redis.io/releases/redis-3.0.3.tar.gz
+    tar xzf redis-3.0.3.tar.gz
+    make -C redis-3.0.3
+    sudo make -C redis-3.0.3 install
+    echo -n | sudo redis-3.0.3/utils/install_server.sh
+
+    sudo apt-get install libxml2-dev libxslt1-dev
+
+    sudo pip install -r /vagrant/requirements.txt
+    sudo python -m nltk.downloader -d /home/vagrant/nltk_data words stopwords punkt
+
     sudo -u postgres createuser vagrant
     sudo -u postgres createdb haukka
     sudo -u postgres createdb haukka_test
-    sudo -u vagrant psql -d haukka -a -f /vagrant/schema.sql
 
     sudo -u vagrant echo "export DATABASE_URL=postgresql:///haukka?connect_timeout=2" >> ~/.profile
     sudo -u vagrant echo "export TEST_DATABASE_URL=postgresql:///haukka_test?connect_timeout=2" >> ~/.profile
-    sudo -u vagrant echo "source ~/env/bin/activate" >> ~/.profile
-    sudo -u vagrant echo "echo Loaded virtual environment!" >> ~/.profile
 
-    sudo -u vagrant echo "python /vagrant/wsgi.py" >> ~/startDev.sh
-    sudo -u vagrant chmod +x ~/startDev.sh
-    sudo -u vagrant echo "uwsgi /vagrant/uwsgi.ini" >> ~/startWSGI.sh
-    sudo -u vagrant chmod +x ~/startWSGI.sh
+    cd /vagrant
+    sudo -u vagrant python manage.py db upgrade
 
   SHELL
 end
