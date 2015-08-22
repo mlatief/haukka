@@ -18,6 +18,8 @@ class ResourcesTestCase(unittest.TestCase):
 
     def setUp(self):
         app.config['SQLALCHEMY_DATABASE_URI'] = TEST_DATABASE_URI
+        app.testing = True
+        app.debug = True
         db.create_all()
 
     def tearDown(self):

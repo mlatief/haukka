@@ -1,4 +1,5 @@
 from flask_restful import Resource, reqparse
+from flask import abort
 import ujson
 
 class Trials(Resource):
@@ -23,4 +24,6 @@ class TrialResource(Resource):
 
         q = db.session.query(Trial)
         r = q.get(trial_id)
+        if not r:
+            abort(404)
         return r.get_json()
