@@ -90,7 +90,6 @@ class BiomarkerClassifier(nltk.TaggerI):
         feats = self.fast_calculate_features(words)
         tags = self.classifier.classify_many(feats)
         conll = zip(words, tags)
-        print conll
         return conll
 
 def store_pickled(classifier, root="nltk_data/classifiers", fname="biomarker_classifier.pickle"):
