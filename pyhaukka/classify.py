@@ -14,7 +14,7 @@ cbio_corpus = PlaintextCorpusReader(corpus_root + '/cbio_cancer_genes', fileids=
 
 cbio_words = list(cbio_corpus.words())
 en_words = list(words.words())
-stop_words = stopwords.words()
+stop_words = list(stopwords.words())
 
 punct = dict.fromkeys(i for i in range(sys.maxunicode) if unicodedata.category(unichr(i)).startswith(u'P'))
 
@@ -90,14 +90,13 @@ class BiomarkerClassifier(nltk.TaggerI):
         feats = self.fast_calculate_features(words)
         tags = self.classifier.classify_many(feats)
         conll = zip(words, tags)
-        print conll
         return conll
 
 def store_pickled(classifier, root="nltk_data/classifiers", fname="biomarker_classifier.pickle"):
     import pickle
     import os
     fpath = os.path.join(root, fname)
-    with open(fpath, "wb+") as f:
+    with open(fpath, "wb") as f:
         pickle.dump(classifier, f)
 
 def load_pickled(root="nltk_data/classifiers", fname="biomarker_classifier.pickle"):

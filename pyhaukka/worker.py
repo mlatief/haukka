@@ -49,6 +49,9 @@ def process_trial(self, url):
             trial = Trial(ct_dict=trial_dict, ners=gner)
             db.session.add(trial)
 
+        if not app.testing:
+            db.session.commit()
+
         return {'status': 'Trial processed!', 'result': nct_id}
 
     raise urllib2.URLError(reason="URL returned no response")
